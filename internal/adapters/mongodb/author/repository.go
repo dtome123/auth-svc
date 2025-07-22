@@ -8,7 +8,7 @@ type AuthorizationRepository struct {
 	AssignmentCol     *mongo.Collection
 	RoleCol           *mongo.Collection
 	PermissionCol     *mongo.Collection
-	PathPermissionCol *mongo.Collection
+	PermissionPathCol *mongo.Collection
 }
 
 func NewAuthorizationCacheRepository(db *mongo.Database) *AuthorizationRepository {
@@ -25,7 +25,7 @@ func NewAuthorizationCacheRepository(db *mongo.Database) *AuthorizationRepositor
 		AssignmentCol:     assignmentCol,
 		RoleCol:           roleCol,
 		PermissionCol:     permissionCol,
-		PathPermissionCol: pathPermissionCol,
+		PermissionPathCol: pathPermissionCol,
 	}
 
 }

@@ -10,7 +10,7 @@ import (
 
 func (r *AuthorizationRepository) GetPermissionByPath(ctx context.Context, path string) (models.PermissionPath, error) {
 	var permission models.PermissionPath
-	err := r.PathPermissionCol.FindOne(ctx, bson.M{"path": path}, &options.FindOneOptions{
+	err := r.PermissionPathCol.FindOne(ctx, bson.M{"path": path}, &options.FindOneOptions{
 		Hint: IdxPermissionPath,
 	}).Decode(&permission)
 	return permission, err

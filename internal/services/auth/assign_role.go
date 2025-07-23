@@ -15,7 +15,7 @@ type AssignRoleInput struct {
 
 func (svc *AuthorizationService) AssignRole(ctx context.Context, req AssignRoleInput) error {
 
-	primUserID, _ := primitive.ObjectIDFromHex(req.UserID)
+	userID, _ := primitive.ObjectIDFromHex(req.UserID)
 	roleIDs := make([]primitive.ObjectID, len(req.RoleIDs))
 	for i, roleID := range req.RoleIDs {
 		primRoleID, _ := primitive.ObjectIDFromHex(roleID)
@@ -23,7 +23,7 @@ func (svc *AuthorizationService) AssignRole(ctx context.Context, req AssignRoleI
 	}
 
 	if err := svc.authorizationRepo.UpsertAssignment(ctx, &models.Assignment{
-		UserID:  primUserID,
+		UserID:  userID,
 		RoleIDs: roleIDs,
 	}); err != nil {
 		return err

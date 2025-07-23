@@ -17,7 +17,6 @@ const (
 )
 
 func indexingPermissionPathCol(col *mongo.Collection) {
-
 	col.Indexes().CreateOne(context.Background(), mongo.IndexModel{
 		Keys: bson.M{
 			"path": 1,

@@ -11,7 +11,7 @@ type AuthorizationRepository struct {
 	PermissionPathCol *mongo.Collection
 }
 
-func NewAuthorizationCacheRepository(db *mongo.Database) *AuthorizationRepository {
+func NewAuthorizationRepository(db *mongo.Database) *AuthorizationRepository {
 	assignmentCol := db.Collection("assignments")
 	roleCol := db.Collection("roles")
 	permissionCol := db.Collection("permissions")

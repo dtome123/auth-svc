@@ -1,6 +1,10 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"auth-svc/internal/types"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Permission struct {
 	ID               primitive.ObjectID `bson:"_id,omitempty" json:"id"`
@@ -21,4 +25,5 @@ type PermissionPath struct {
 	Path     string             `bson:"path" json:"path"`
 	Resource string             `bson:"resource" json:"resource"`
 	Action   string             `bson:"action" json:"action"`
+	Type     types.RouteScope   `bson:"type" json:"type"`
 }

@@ -14,10 +14,16 @@ type AuthorizationCacheRepository struct {
 	TTL   time.Duration
 }
 
-func NewAuthorizationCacheRepository(redisClient *redis.Client, ttl time.Duration) *AuthorizationCacheRepository {
+func NewAuthorizationCacheRepository(redisClient *redis.Client, ttl string) *AuthorizationCacheRepository {
+
+	dur, err := time.ParseDuration(ttl)
+	if err != nil {
+		panic(err)
+	}
+
 	return &AuthorizationCacheRepository{
 		Redis: redisClient,
-		TTL:   ttl,
+		TTL:   dur,
 	}
 }
 
@@ -58,6 +64,11 @@ func (repo *AuthorizationCacheRepository) InvalidatePermissions(ctx context.Cont
 	return repo.Redis.Del(ctx, cacheKey).Err()
 }
 
+func (repo *AuthorizationCacheRepository) ClearUserPermissions(ctx context.Context, userID string) error {
+	cacheKey := repo.buildPermissionListCacheKey(userID)
+	return repo.Redis.Del(ctx, cacheKey).Err()
+}
+
 //
 // === PERMISSION CHECK RESULT CACHE (true/false) ===
 //
@@ -87,6 +98,11 @@ func (repo *AuthorizationCacheRepository) SetPermissionCheckResult(ctx context.C
 
 func (repo *AuthorizationCacheRepository) InvalidatePermissionCheckResult(ctx context.Context, userID, fullMethod string) error {
 	cacheKey := repo.buildPermissionCheckKey(userID, fullMethod)
+	return repo.Redis.Del(ctx, cacheKey).Err()
+}
+
+func (repo *AuthorizationCacheRepository) ClearUserPermissionCheck(ctx context.Context, userID string) error {
+	cacheKey := repo.buildPermissionCheckKey(userID, "*")
 	return repo.Redis.Del(ctx, cacheKey).Err()
 }
 

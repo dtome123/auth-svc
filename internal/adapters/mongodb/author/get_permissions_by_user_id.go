@@ -21,30 +21,21 @@ func (repo *AuthorizationRepository) GetPermissionsByUserID(ctx context.Context,
 	}
 
 	// Find all assignments for the user to get role IDs
-	var assignments []models.Assignment
-	cursor, err := repo.AssignmentCol.Find(ctx, bson.M{"user_id": uid}, &options.FindOptions{
+	var assignment models.Assignment
+	assignmentRes := repo.AssignmentCol.FindOne(ctx, bson.M{"user_id": uid}, &options.FindOneOptions{
 		Hint: IdxAssignmentUserId,
 	})
-	if err != nil {
-		return nil, err
-	}
-	if err := cursor.All(ctx, &assignments); err != nil {
-		return nil, err
-	}
 
-	if len(assignments) == 0 {
-		return permissions, nil
+	if err := assignmentRes.Decode(&assignment); err != nil {
+		return nil, err
 	}
 
 	// Collect all role IDs from assignments
-	roleIDs := make([]primitive.ObjectID, 0, len(assignments))
-	for _, a := range assignments {
-		roleIDs = append(roleIDs, a.RoleID)
-	}
+	roleIDs := assignment.RoleIDs
 
 	// Find all roles by the collected role IDs
 	var roles []models.Role
-	cursor, err = repo.RoleCol.Find(ctx, bson.M{"_id": bson.M{"$in": roleIDs}})
+	cursor, err := repo.RoleCol.Find(ctx, bson.M{"_id": bson.M{"$in": roleIDs}})
 	if err != nil {
 		return nil, err
 	}

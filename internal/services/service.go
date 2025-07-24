@@ -6,18 +6,20 @@ import (
 	authorDb "auth-svc/internal/adapters/mongodb/author"
 	"auth-svc/internal/adapters/redis/author"
 	"auth-svc/internal/services/auth"
-	"crypto/sha256"
+	"auth-svc/internal/types"
 
+	"github.com/dtome123/auth-sdk/jwtutils"
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
-
-	jwtCrypto "github.com/dtome123/auth-sdk/jwtutils/crypto"
 )
 
 type Service struct {
 	cfg         *config.Config
 	authService *auth.AuthorizationService
-	jwtCrypto   jwtCrypto.JWTCrypto
+}
+
+func (s *Service) GetAuthService() *auth.AuthorizationService {
+	return s.authService
 }
 
 func NewService(cfg *config.Config, db *mongo.Database, redisClient *redis.Client) *Service {
@@ -29,15 +31,28 @@ func NewService(cfg *config.Config, db *mongo.Database, redisClient *redis.Clien
 	if cfg.Caching.Enable {
 		authorCacheRepo = author.NewAuthorizationCacheRepository(redisClient, cfg.Caching.TTL)
 	}
+	var serverSigner jwtutils.Signer
+	var serverVerifier jwtutils.Verifier
+
+	switch cfg.AuthConfig.Client.Type {
+	case types.AuthClientHMAC:
+		serverSigner = jwtutils.NewHMACSigner([]byte(cfg.AuthConfig.Client.HMAC.Secret))
+		serverVerifier = jwtutils.NewHMACVerifier([]byte(cfg.AuthConfig.Client.HMAC.Secret))
+	case types.AuthClientRSA:
+		var err error
+		serverSigner, err = jwtutils.NewRS256SignerFromPath(cfg.AuthConfig.Client.RSA.PrivateKeyPath)
+		if err != nil {
+			panic(err)
+		}
+
+		serverVerifier, err = jwtutils.NewRS256VerifierFromPath(cfg.AuthConfig.Client.RSA.PublicKeyPath)
+		if err != nil {
+			panic(err)
+		}
+	}
 
 	return &Service{
-		cfg: cfg,
-		jwtCrypto: jwtCrypto.NewRsaOEAPJWTCrypto(jwtCrypto.RsaOEAPJWTConfig{
-			PubPath:       cfg.Cert.PublicKeyPath,
-			PrivPath:      cfg.Cert.PrivateKeyPath,
-			OaepLabel:     []byte("auth-svc"),
-			OaepHashNewFn: sha256.New,
-		}),
-		authService: auth.NewAuthorizationService(cfg, authorRepo, authenRepo, authorCacheRepo),
+		cfg:         cfg,
+		authService: auth.NewAuthorizationService(cfg, serverSigner, serverVerifier, authorRepo, authenRepo, authorCacheRepo),
 	}
 }

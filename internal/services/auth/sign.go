@@ -7,8 +7,6 @@ import (
 	"encoding/json"
 	"maps"
 	"time"
-
-	"github.com/dtome123/auth-sdk/jwtutils"
 )
 
 type SignInput struct {
@@ -59,7 +57,7 @@ func (svc *AuthorizationService) Sign(ctx context.Context, req SignInput) (*Sign
 	accessClaims := maps.Clone(baseClaims)
 	accessExp := time.Now().Add(accessTTL)
 	accessClaims["exp"] = accessExp.Unix()
-	accessToken, err := jwtutils.SignJWTWithRS256(accessClaims, svc.cfg.Cert.PrivateKeyPath, accessTTL)
+	accessToken, err := svc.serverSigner.Sign(accessClaims, accessTTL)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +66,7 @@ func (svc *AuthorizationService) Sign(ctx context.Context, req SignInput) (*Sign
 	// Refresh token claims
 	refreshClaims := maps.Clone(baseClaims)
 	refreshClaims["exp"] = time.Now().Add(refreshTTL).Unix()
-	refreshToken, err := jwtutils.SignJWTWithRS256(refreshClaims, svc.cfg.Cert.PrivateKeyPath, refreshTTL)
+	refreshToken, err := svc.serverSigner.Sign(refreshClaims, refreshTTL)
 	if err != nil {
 		return nil, err
 	}

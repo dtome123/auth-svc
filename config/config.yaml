@@ -1,7 +1,3 @@
-cert:
-  private_key_path: cert/private.pem
-  public_key_path: cert/public.pem
-
 server:
   host: 0.0.0.0
   http_port: 8080
@@ -26,3 +22,27 @@ service:
   session:
     access_token_ttl: 15d
     refresh_token_ttl: 30d
+  enable_encryption: true
+
+auth:
+  external_envoy:
+    header: "authorization"
+    scheme: "bearer"
+
+  client:
+    type: "rsa" # "rsa" or "hmac"
+    rsa256:
+      private_key_path: cert/private.pem
+      public_key_path: cert/public.pem
+    hmac:
+      secret: "secret"
+
+  m2m:
+    enable_assertion: true
+    type: "rsa" # "rsa" or "hmac"
+    whitelist:
+      internal_services:
+        - name: "customer-svc"
+          public_key: "public_key"
+        - name: "admin-svc"
+          public_key: "public_key"

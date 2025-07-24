@@ -15,14 +15,17 @@ type CheckInput struct {
 	FullMethod  string
 }
 
-func (svc *AuthorizationService) Check(ctx context.Context, req CheckInput) (bool, error) {
-	if req.AccessToken == "" {
-		return false, fmt.Errorf("token is required")
-	}
+type CheckOutput struct {
+	Allowed    bool
+	StatusCode int32
+	Message    string
+}
+
+func (svc *AuthorizationService) Check(ctx context.Context, req CheckInput) (CheckOutput, error) {
 
 	claims, err := jwtutils.Extract(req.AccessToken)
 	if err != nil {
-		return false, err
+		return checkInternalServerError(err), err
 	}
 	userID := claims.Get("sub").AsString()
 	deviceID := claims.Get("device_id").AsString()
@@ -30,37 +33,43 @@ func (svc *AuthorizationService) Check(ctx context.Context, req CheckInput) (boo
 	// Check cache
 	if svc.cfg.Caching.Enable {
 		if allowed, found, err := svc.authorCache.GetPermissionCheckResult(ctx, userID, req.FullMethod); err == nil && found && allowed {
-			return true, nil
+			return checkOK(), nil
 		}
 	}
 
 	permission, err := svc.authorizationRepo.GetPermissionByPath(ctx, req.FullMethod)
 	if err != nil {
-		return false, err
+		return checkInternalServerError(err), err
 	}
 
 	// Public route: always allow
 	if permission.Type == types.RouteScopePublic {
 		svc.cachePermissionCheckResult(ctx, userID, req.FullMethod, true)
-		return true, nil
+		return checkOK(), nil
+	}
+
+	if req.AccessToken == "" {
+		return checkUnauthorized("token is required"), fmt.Errorf("token is required")
 	}
 
 	// Validate session and token
 	if err := svc.validateSessionAndToken(ctx, userID, deviceID, req.AccessToken); err != nil {
-		return false, err
+		return checkUnauthorized("invalid token"), err
 	}
 
 	// Check if user has required permission
 	hasPermission, err := svc.userHasPermission(ctx, userID, permission)
 	if err != nil {
-		return false, err
+		return checkInternalServerError(err), err
 	}
 
-	if hasPermission {
-		svc.cachePermissionCheckResult(ctx, userID, req.FullMethod, true)
+	if !hasPermission {
+		return checkForbidden(), nil
 	}
 
-	return hasPermission, nil
+	// cache miss
+	svc.cachePermissionCheckResult(ctx, userID, req.FullMethod, true)
+	return checkOK(), nil
 }
 
 func (svc *AuthorizationService) validateSessionAndToken(ctx context.Context, userID, deviceID, accessToken string) error {
@@ -76,7 +85,7 @@ func (svc *AuthorizationService) validateSessionAndToken(ctx context.Context, us
 		return fmt.Errorf("invalid token")
 	}
 
-	if _, err := jwtutils.VerifyJWTWithRS256(accessToken, svc.cfg.Cert.PublicKeyPath); err != nil {
+	if _, err := svc.serverVerifier.Verify(accessToken); err != nil {
 		return err
 	}
 

@@ -1,29 +1,25 @@
 package config
 
 import (
+	"auth-svc/internal/types"
 	"strings"
 
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Cert    Cert    `mapstructure:"cert"`
-	Server  Server  `mapstructure:"server"`
-	Redis   Redis   `mapstructure:"redis"`
-	DB      DB      `mapstructure:"db"`
-	Caching Caching `mapstructure:"caching"`
-	Service Service `mapstructure:"service"`
+	Server     Server     `mapstructure:"server"`
+	Redis      Redis      `mapstructure:"redis"`
+	DB         DB         `mapstructure:"db"`
+	Caching    Caching    `mapstructure:"caching"`
+	Service    Service    `mapstructure:"service"`
+	AuthConfig AuthConfig `mapstructure:"auth"`
 }
 
 type Server struct {
 	Host     string `mapstructure:"host"`
 	GrpcPort string `mapstructure:"grpc_port"`
 	HttpPort string `mapstructure:"http_port"`
-}
-
-type Cert struct {
-	PrivateKeyPath string `mapstructure:"private_key_path"`
-	PublicKeyPath  string `mapstructure:"public_key_path"`
 }
 
 type Redis struct {
@@ -45,11 +41,41 @@ type DB struct {
 	} `mapstructure:"mongo"`
 }
 
+type AuthConfig struct {
+	ExternalEnvoy struct {
+		Header string `mapstructure:"header"`
+		Scheme string `mapstructure:"scheme"`
+	} `mapstructure:"external_envoy"`
+	Client struct {
+		Type types.AuthClient `mapstructure:"type"`
+		RSA  struct {
+			PrivateKeyPath string `mapstructure:"private_key_path"`
+			PublicKeyPath  string `mapstructure:"public_key_path"`
+		} `mapstructure:"rsa"`
+		HMAC struct {
+			Secret string `mapstructure:"secret"`
+		} `mapstructure:"hmac"`
+	} `mapstructure:"client"`
+
+	M2M struct {
+		EnableAssertion bool             `mapstructure:"enable_assertion"`
+		Type            types.AuthClient `mapstructure:"type"`
+		Whitelist       Whitelist        `mapstructure:"whitelist"`
+	} `mapstructure:"m2m"`
+}
+
 type Service struct {
 	Session struct {
 		AccessTokenTTL  string `mapstructure:"access_token_ttl"`
 		RefreshTokenTTL string `mapstructure:"refresh_token_ttl"`
 	} `mapstructure:"session"`
+}
+
+type Whitelist struct {
+	InternalServices []struct {
+		Name      string `mapstructure:"name"`
+		PublicKey string `mapstructure:"public_key"`
+	} `mapstructure:"internal_services"`
 }
 
 func LoadConfig() (*Config, error) {

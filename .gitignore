@@ -1,2 +1,5 @@
 cert
 vendor
+
+whitelist/keys
+whitelist/services-whitelist.json

@@ -9,3 +9,4 @@ import (
 func (GrpcServer) Refresh(ctx context.Context, req *authPb.RefreshRequest) (*authPb.RefreshResponse, error) {
 	return nil, nil
 }
+		

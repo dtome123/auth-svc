@@ -34,18 +34,18 @@ func NewService(cfg *config.Config, db *mongo.Database, redisClient *redis.Clien
 	var serverSigner jwtutils.Signer
 	var serverVerifier jwtutils.Verifier
 
-	switch cfg.AuthConfig.Client.Type {
-	case types.AuthClientHMAC:
-		serverSigner = jwtutils.NewHMACSigner([]byte(cfg.AuthConfig.Client.HMAC.Secret))
-		serverVerifier = jwtutils.NewHMACVerifier([]byte(cfg.AuthConfig.Client.HMAC.Secret))
-	case types.AuthClientRSA:
+	switch cfg.AuthConfig.UserJWT.Type {
+	case types.AuthUserTypeHMAC:
+		serverSigner = jwtutils.NewHMACSigner([]byte(cfg.AuthConfig.UserJWT.HMAC.Secret))
+		serverVerifier = jwtutils.NewHMACVerifier([]byte(cfg.AuthConfig.UserJWT.HMAC.Secret))
+	case types.AuthUserTypeRSA:
 		var err error
-		serverSigner, err = jwtutils.NewRS256SignerFromPath(cfg.AuthConfig.Client.RSA.PrivateKeyPath)
+		serverSigner, err = jwtutils.NewRS256SignerFromPath(cfg.AuthConfig.UserJWT.RSA.PrivateKeyPath)
 		if err != nil {
 			panic(err)
 		}
 
-		serverVerifier, err = jwtutils.NewRS256VerifierFromPath(cfg.AuthConfig.Client.RSA.PublicKeyPath)
+		serverVerifier, err = jwtutils.NewRS256VerifierFromPath(cfg.AuthConfig.UserJWT.RSA.PublicKeyPath)
 		if err != nil {
 			panic(err)
 		}

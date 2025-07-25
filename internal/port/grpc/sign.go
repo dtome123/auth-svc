@@ -4,7 +4,7 @@ import (
 	"auth-svc/internal/services/auth"
 	"context"
 
-	authPb "github.com/dtome123/auth-sdk/gen/go/auth/v1"
+	authPb "github.com/dtome123/auth-sdk/api/go/auth/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -24,7 +24,7 @@ func (s *GrpcServer) Sign(ctx context.Context, req *authPb.SignRequest) (*authPb
 	return &authPb.SignResponse{
 		AccessToken:  res.AccessToken,
 		RefreshToken: res.RefreshToken,
-		ExpiresIn:    int64(res.ExpiresAt.Second()),
+		ExpiresIn:    res.ExpiresIn,
 		ExpiresAt:    timestamppb.New(res.ExpiresAt),
 	}, nil
 }

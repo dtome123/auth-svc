@@ -1,16 +1,18 @@
 package grpc
 
 import (
-	"auth-svc/config"
-	interceptor "auth-svc/internal/interceptor/gprc"
-	"auth-svc/internal/services"
+	"fmt"
 	"log"
 	"net"
 
-	"google.golang.org/grpc"
+	"auth-svc/config"
+	"auth-svc/internal/port/grpc/interceptor"
+	"auth-svc/internal/services"
 
-	authPb "github.com/dtome123/auth-sdk/gen/go/auth/v1"
+	authPb "github.com/dtome123/auth-sdk/api/go/auth/v1"
 	exAuthPb "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 type GrpcServer struct {
@@ -29,16 +31,18 @@ func NewGrpcServer(cfg *config.Config, svc *services.Service) *GrpcServer {
 }
 
 func (s *GrpcServer) Run() {
-	lis, err := net.Listen("tcp:", s.cfg.Server.GrpcPort)
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", s.cfg.Server.GrpcPort))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	clientAssertionInterceptor := interceptor.NewClientAssertionInterceptor(s.cfg.AuthConfig)
+	clientAssertionInterceptor := interceptor.NewUserDelegationInterceptor(s.cfg.AuthConfig)
 
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(clientAssertionInterceptor.Unary()),
+		grpc.UnaryInterceptor(clientAssertionInterceptor.UnaryInterceptor()),
 	)
+
+	reflection.Register(grpcServer)
 
 	authPb.RegisterAuthServiceServer(grpcServer, s)
 	exAuthPb.RegisterAuthorizationServer(grpcServer, s)

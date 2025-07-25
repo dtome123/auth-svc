@@ -20,10 +20,11 @@ type SignOutput struct {
 	AccessToken  string    `json:"access_token"`
 	RefreshToken string    `json:"refresh_token"`
 	ExpiresAt    time.Time `json:"expires_at"`
-	ExpireIn     int64     `json:"expire_in"`
+	ExpiresIn    int64     `json:"expire_in"`
 }
 
 func (svc *AuthorizationService) Sign(ctx context.Context, req SignInput) (*SignOutput, error) {
+
 	// Parse metadata into a map
 	claimData := map[string]interface{}{}
 	if err := json.Unmarshal([]byte(req.Metadata), &claimData); err != nil {
@@ -31,11 +32,11 @@ func (svc *AuthorizationService) Sign(ctx context.Context, req SignInput) (*Sign
 	}
 
 	// Parse durations from config
-	accessTTL, err := time.ParseDuration(svc.cfg.Service.Session.AccessTokenTTL)
+	accessTTL, err := utils.ParseFlexibleDuration(svc.cfg.Service.Session.AccessTokenTTL)
 	if err != nil {
 		return nil, err
 	}
-	refreshTTL, err := time.ParseDuration(svc.cfg.Service.Session.RefreshTokenTTL)
+	refreshTTL, err := utils.ParseFlexibleDuration(svc.cfg.Service.Session.RefreshTokenTTL)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +74,7 @@ func (svc *AuthorizationService) Sign(ctx context.Context, req SignInput) (*Sign
 	refreshTokenHash := utils.HashSHA256(refreshToken)
 
 	// Persist session in the DB
-	err = svc.authenticationRepo.CreateSession(ctx, models.Session{
+	err = svc.authenticationRepo.UpsertSession(ctx, models.Session{
 		UserID:           req.UserID,
 		DeviceID:         req.DeviceID,
 		Type:             req.UserType,
@@ -90,6 +91,6 @@ func (svc *AuthorizationService) Sign(ctx context.Context, req SignInput) (*Sign
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		ExpiresAt:    accessExp,
-		ExpireIn:     int64(accessTTL.Seconds()),
+		ExpiresIn:    int64(accessTTL.Seconds()),
 	}, nil
 }

@@ -22,7 +22,6 @@ service:
   session:
     access_token_ttl: 15d
     refresh_token_ttl: 30d
-  enable_encryption: true
 
 auth:
   aud: "auth-svc"

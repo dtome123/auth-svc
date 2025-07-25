@@ -48,8 +48,8 @@ type AuthConfig struct {
 		Header string `mapstructure:"header"`
 		Scheme string `mapstructure:"scheme"`
 	} `mapstructure:"external_envoy"`
-	Client struct {
-		Type types.AuthClient `mapstructure:"type"`
+	UserJWT struct {
+		Type types.AuthUserType `mapstructure:"type"`
 		RSA  struct {
 			PrivateKeyPath string `mapstructure:"private_key_path"`
 			PublicKeyPath  string `mapstructure:"public_key_path"`
@@ -57,13 +57,18 @@ type AuthConfig struct {
 		HMAC struct {
 			Secret string `mapstructure:"secret"`
 		} `mapstructure:"hmac"`
-	} `mapstructure:"client"`
-
-	M2M struct {
-		EnableAssertion bool             `mapstructure:"enable_assertion"`
-		Type            types.AuthClient `mapstructure:"type"`
-		Whitelist       Whitelist        `mapstructure:"whitelist"`
-	} `mapstructure:"m2m"`
+	} `mapstructure:"user_jwt"`
+	Oauth struct {
+		PublicKeyPath  string `mapstructure:"public_key_path"`
+		PrivateKeyPath string `mapstructure:"private_key_path"`
+		Clients        []struct {
+			Name          string            `mapstructure:"name"`
+			Type          types.AuthM2MType `mapstructure:"type"`
+			PublicKey     string            `mapstructure:"public_key"`
+			SecretKey     string            `mapstructure:"secret_key"`
+			AllowUserAuth bool              `mapstructure:"allow_user_authenticate"`
+		} `mapstructure:"clients"`
+	} `mapstructure:"oauth"`
 }
 
 type Service struct {
@@ -71,13 +76,6 @@ type Service struct {
 		AccessTokenTTL  string `mapstructure:"access_token_ttl"`
 		RefreshTokenTTL string `mapstructure:"refresh_token_ttl"`
 	} `mapstructure:"session"`
-}
-
-type Whitelist struct {
-	InternalServices []struct {
-		Name      string `mapstructure:"name"`
-		PublicKey string `mapstructure:"public_key"`
-	} `mapstructure:"internal_services"`
 }
 
 func LoadConfig() (*Config, error) {

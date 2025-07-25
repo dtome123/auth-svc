@@ -3,9 +3,11 @@ module auth-svc
 go 1.24.5
 
 require (
-	github.com/dtome123/auth-sdk v0.0.0-20250724105330-c0f808ef0d03
+	github.com/dtome123/auth-sdk v0.0.0-20250725110352-1d6a7f8dd928
 	github.com/envoyproxy/go-control-plane/envoy v1.32.4
 	github.com/gin-gonic/gin v1.10.1
+	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.11.0
 	github.com/spf13/viper v1.20.1
 	go.mongodb.org/mongo-driver v1.17.4
@@ -61,6 +63,7 @@ require (
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.38.0 // indirect
 	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sync v0.14.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect

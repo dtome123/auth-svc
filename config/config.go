@@ -14,6 +14,7 @@ type Config struct {
 	Caching    Caching    `mapstructure:"caching"`
 	Service    Service    `mapstructure:"service"`
 	AuthConfig AuthConfig `mapstructure:"auth"`
+	Aud        string     `mapstructure:"aud"`
 }
 
 type Server struct {
@@ -42,6 +43,7 @@ type DB struct {
 }
 
 type AuthConfig struct {
+	Aud           string `mapstructure:"aud"`
 	ExternalEnvoy struct {
 		Header string `mapstructure:"header"`
 		Scheme string `mapstructure:"scheme"`
@@ -84,7 +86,7 @@ func LoadConfig() (*Config, error) {
 	v := viper.NewWithOptions()
 	v.AddConfigPath(".")
 	v.SetConfigType("yaml")
-	v.SetConfigFile("config/config.yml")
+	v.SetConfigFile("config/config.yaml")
 
 	if err := v.ReadInConfig(); err != nil {
 		return nil, err

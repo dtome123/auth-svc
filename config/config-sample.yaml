@@ -11,8 +11,8 @@ redis:
 
 db:
   mongo:
-    dsn: mongodb://127.0.0.1:27017
-    database: test
+    dsn: mongodb://localhost:27017/
+    database: auth-db
 
 caching:
   enable: true
@@ -25,6 +25,7 @@ service:
   enable_encryption: true
 
 auth:
+  aud: "auth-svc"
   external_envoy:
     header: "authorization"
     scheme: "bearer"

@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"auth-svc/config"
+	interceptor "auth-svc/internal/interceptor/gprc"
 	"auth-svc/internal/services"
 	"log"
 	"net"
@@ -33,7 +34,11 @@ func (s *GrpcServer) Run() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
+	clientAssertionInterceptor := interceptor.NewClientAssertionInterceptor(s.cfg.AuthConfig)
+
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(clientAssertionInterceptor.Unary()),
+	)
 
 	authPb.RegisterAuthServiceServer(grpcServer, s)
 	exAuthPb.RegisterAuthorizationServer(grpcServer, s)

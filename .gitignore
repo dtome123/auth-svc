@@ -3,3 +3,8 @@ vendor
 
 whitelist/keys
 whitelist/services-whitelist.json
+
+config/config.yaml
+config/config_test.yaml
+
+__debug_bin*

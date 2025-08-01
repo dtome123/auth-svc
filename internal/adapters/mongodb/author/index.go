@@ -2,6 +2,7 @@ package author
 
 import (
 	"context"
+	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -9,39 +10,32 @@ import (
 )
 
 const (
-	IdxPermissionPath = "_idx_permission_path_"
-
+	IdxPermissionPath           = "_idx_permission_path_"
 	IdxPermissionResourceAction = "_idx_permission_resource_action_"
-
-	IdxAssignmentUserId = "_idx_permission_user_id_"
+	IdxPermissionDomain         = "_idx_permission_domain_"
+	IdxAssignmentUserId         = "_idx_permission_user_id_"
 )
 
-func indexingPermissionPathCol(col *mongo.Collection) {
+// ensureIndexes sets up all necessary indexes for the authorization collections.
+func ensureIndexes(repo *AuthorizationRepository) {
+	createIndex(repo.PermissionPathCol, bson.D{{Key: "path", Value: 1}}, IdxPermissionPath, true)
+	createIndex(repo.PermissionCol, bson.D{
+		{Key: "resource", Value: 1},
+		{Key: "action", Value: 1},
+		{Key: "domain", Value: 1},
+	}, IdxPermissionResourceAction, true)
+	createIndex(repo.PermissionCol, bson.D{{Key: "domain", Value: 1}}, IdxPermissionDomain, false)
 
-	col.Indexes().CreateOne(context.Background(), mongo.IndexModel{
-		Keys: bson.M{
-			"path": 1,
-		},
-		Options: options.Index().SetName(IdxPermissionPath).SetUnique(true),
-	})
+	createIndex(repo.AssignmentCol, bson.D{{Key: "user_id", Value: 1}}, IdxAssignmentUserId, false)
 }
 
-func indexingPermissionCol(col *mongo.Collection) {
-	col.Indexes().CreateOne(context.Background(), mongo.IndexModel{
-		Keys: bson.M{
-			"resource": 1,
-			"action":   1,
-			"domain":   1,
-		},
-		Options: options.Index().SetName(IdxPermissionResourceAction).SetUnique(true),
+// createIndex is a helper to create a MongoDB index.
+func createIndex(col *mongo.Collection, keys bson.D, name string, unique bool) {
+	_, err := col.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+		Keys:    keys,
+		Options: options.Index().SetName(name).SetUnique(unique),
 	})
-}
-
-func indexingAssignmentCol(col *mongo.Collection) {
-	col.Indexes().CreateOne(context.Background(), mongo.IndexModel{
-		Keys: bson.M{
-			"user_id": 1,
-		},
-		Options: options.Index().SetName(IdxAssignmentUserId),
-	})
+	if err != nil {
+		log.Printf("Failed to create index %s: %v", name, err)
+	}
 }

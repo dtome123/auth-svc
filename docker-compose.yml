@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-svc
+    image: auth-svc:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - cert-data:/app/cert
+    restart: unless-stopped
+
+volumes:
+  cert-data:

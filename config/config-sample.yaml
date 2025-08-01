@@ -1,0 +1,53 @@
+server:
+  http_port: 8080
+  grpc_port: 8081
+
+redis:
+  host: localhost
+  port: 6379
+  pwd: pwd
+  database: 0
+
+db:
+  mongo:
+    dsn: mongodb+srv://admin:password@localhost:27017/
+    database: auth-db
+
+caching:
+  enable: true
+  ttl: 5m
+
+service:
+  session:
+    access_token_ttl: 15d
+    refresh_token_ttl: 30d
+
+auth:
+  aud: "auth-svc"
+  system_aud: "system.com"
+  external_envoy:
+    header: "authorization"
+    scheme: "bearer"
+  enable_replay_check: false
+
+  oauth:
+    private_key_path: cert/private.pem
+    public_key_path: cert/public.pem
+    access_token_ttl: 5m
+    clients:
+      - name: "svc"
+        type: "rsa" # "rsa" or "hmac"
+        allow_user_authenticate: true
+        allowed_audiences:
+          - "order-svc"
+        public_key: |
+          -----BEGIN PUBLIC KEY-----
+          -----END PUBLIC KEY-----
+
+  user_jwt:
+    type: "rsa" # "rsa" or "hmac"
+    rsa:
+      private_key_path: cert/private.pem
+      public_key_path: cert/public.pem
+    hmac:
+      secret: "secret"

@@ -10,14 +10,20 @@ import (
 )
 
 type AuthorizationCacheRepository struct {
-	Redis *redis.Client
-	TTL   time.Duration
+	Redis       *redis.Client
+	durationTTL time.Duration
 }
 
-func NewAuthorizationCacheRepository(redisClient *redis.Client, ttl time.Duration) *AuthorizationCacheRepository {
+func NewAuthorizationCacheRepository(redisClient *redis.Client, durationTTL string) *AuthorizationCacheRepository {
+
+	dur, err := time.ParseDuration(durationTTL)
+	if err != nil {
+		panic(err)
+	}
+
 	return &AuthorizationCacheRepository{
-		Redis: redisClient,
-		TTL:   ttl,
+		Redis:       redisClient,
+		durationTTL: dur,
 	}
 }
 
@@ -50,10 +56,15 @@ func (repo *AuthorizationCacheRepository) SetPermissions(ctx context.Context, us
 	}
 
 	cacheKey := repo.buildPermissionListCacheKey(userID)
-	return repo.Redis.Set(ctx, cacheKey, data, repo.TTL).Err()
+	return repo.Redis.Set(ctx, cacheKey, data, repo.durationTTL).Err()
 }
 
 func (repo *AuthorizationCacheRepository) InvalidatePermissions(ctx context.Context, userID string) error {
+	cacheKey := repo.buildPermissionListCacheKey(userID)
+	return repo.Redis.Del(ctx, cacheKey).Err()
+}
+
+func (repo *AuthorizationCacheRepository) ClearUserPermissions(ctx context.Context, userID string) error {
 	cacheKey := repo.buildPermissionListCacheKey(userID)
 	return repo.Redis.Del(ctx, cacheKey).Err()
 }
@@ -82,11 +93,16 @@ func (repo *AuthorizationCacheRepository) SetPermissionCheckResult(ctx context.C
 	}
 
 	cacheKey := repo.buildPermissionCheckKey(userID, fullMethod)
-	return repo.Redis.Set(ctx, cacheKey, val, repo.TTL).Err()
+	return repo.Redis.Set(ctx, cacheKey, val, repo.durationTTL).Err()
 }
 
 func (repo *AuthorizationCacheRepository) InvalidatePermissionCheckResult(ctx context.Context, userID, fullMethod string) error {
 	cacheKey := repo.buildPermissionCheckKey(userID, fullMethod)
+	return repo.Redis.Del(ctx, cacheKey).Err()
+}
+
+func (repo *AuthorizationCacheRepository) ClearUserPermissionCheck(ctx context.Context, userID string) error {
+	cacheKey := repo.buildPermissionCheckKey(userID, "*")
 	return repo.Redis.Del(ctx, cacheKey).Err()
 }
 

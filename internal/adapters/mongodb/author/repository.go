@@ -8,24 +8,20 @@ type AuthorizationRepository struct {
 	AssignmentCol     *mongo.Collection
 	RoleCol           *mongo.Collection
 	PermissionCol     *mongo.Collection
-	PathPermissionCol *mongo.Collection
+	PermissionPathCol *mongo.Collection
 }
 
-func NewAuthorizationCacheRepository(db *mongo.Database) *AuthorizationRepository {
-	assignmentCol := db.Collection("assignments")
-	roleCol := db.Collection("roles")
-	permissionCol := db.Collection("permissions")
-	pathPermissionCol := db.Collection("path_permissions")
-
-	indexingAssignmentCol(assignmentCol)
-	indexingPermissionCol(permissionCol)
-	indexingPermissionPathCol(pathPermissionCol)
-
-	return &AuthorizationRepository{
-		AssignmentCol:     assignmentCol,
-		RoleCol:           roleCol,
-		PermissionCol:     permissionCol,
-		PathPermissionCol: pathPermissionCol,
+// NewAuthorizationRepository initializes collections and indexes for authorization.
+func NewAuthorizationRepository(db *mongo.Database) *AuthorizationRepository {
+	repo := &AuthorizationRepository{
+		AssignmentCol:     db.Collection("assignments"),
+		RoleCol:           db.Collection("roles"),
+		PermissionCol:     db.Collection("permissions"),
+		PermissionPathCol: db.Collection("path_permissions"),
 	}
 
+	// Setup indexes for faster access
+	ensureIndexes(repo)
+
+	return repo
 }

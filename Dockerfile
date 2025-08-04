@@ -11,8 +11,6 @@ COPY . .
 # Build main binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main ./main.go
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/genrsa ./tools/rsa/main.go
-
 # Stage 2: Runtime
 FROM alpine:latest
 

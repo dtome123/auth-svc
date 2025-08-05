@@ -13,7 +13,7 @@ import (
 func (repo *AuthorizationRepository) UpsertAssignment(ctx context.Context, assignment *models.Assignment) error {
 	updateOpts := options.Update().SetUpsert(true)
 
-	err := repo.assignmentCol.UpdateSetOne(
+	err := repo.assignmentCol.UpdateOne(
 		ctx,
 		bson.M{"user_id": assignment.UserID},
 		bson.M{"$set": assignment},

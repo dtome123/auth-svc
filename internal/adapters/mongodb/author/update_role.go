@@ -27,7 +27,7 @@ func (repo *AuthorizationRepository) UpdateRole(ctx context.Context, role *model
 	filter := bson.M{"_id": objID}
 	update := bson.M{"$set": role}
 
-	err = repo.roleCol.UpdateSetOne(ctx, filter, update, &options.UpdateOptions{
+	err = repo.roleCol.UpdateOne(ctx, filter, update, &options.UpdateOptions{
 		Hint: "_id",
 	})
 	return err

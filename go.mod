@@ -4,6 +4,7 @@ go 1.24.5
 
 require (
 	github.com/dtome123/auth-sdk v0.1.0
+	github.com/dtome123/go-mongo-generic v0.0.0-20250805072324-aecc90b51c5b
 	github.com/envoyproxy/go-control-plane/envoy v1.32.4
 	github.com/gin-gonic/gin v1.10.1
 	github.com/google/uuid v1.6.0

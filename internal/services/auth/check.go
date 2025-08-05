@@ -42,6 +42,10 @@ func (svc *AuthorizationService) Check(ctx context.Context, req CheckInput) (Che
 		return checkInternalServerError(err), err
 	}
 
+	if permission == nil {
+		return checkMethodNotAllowed(), nil
+	}
+
 	// Public route: always allow
 	if permission.Type == types.RouteScopePublic {
 		svc.cachePermissionCheckResult(ctx, userID, req.FullMethod, true)
@@ -92,8 +96,8 @@ func (svc *AuthorizationService) validateSessionAndToken(ctx context.Context, us
 	return nil
 }
 
-func (svc *AuthorizationService) userHasPermission(ctx context.Context, userID string, permission models.PermissionPath) (bool, error) {
-	var perms []models.Permission
+func (svc *AuthorizationService) userHasPermission(ctx context.Context, userID string, permission *models.PermissionPath) (bool, error) {
+	var perms []*models.Permission
 	var err error
 
 	// Try to get from cache

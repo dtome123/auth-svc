@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/dtome123/auth-sdk/jwtutils"
+	mongodb "github.com/dtome123/go-mongo-generic"
 	"github.com/redis/go-redis/v9"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Service struct {
@@ -26,7 +26,7 @@ func (s *Service) GetAuthService() *auth.AuthorizationService {
 
 func NewService(
 	cfg *config.Config,
-	db *mongo.Database,
+	db *mongodb.Database,
 	redisClient *redis.Client,
 	clientVerifiers map[string]types.ClientEntry,
 	serverSigner jwtutils.Signer,

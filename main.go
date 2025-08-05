@@ -4,14 +4,11 @@ import (
 	"auth-svc/config"
 	"auth-svc/internal/port"
 	"auth-svc/internal/types"
-	"context"
 	"fmt"
-	"time"
 
 	"github.com/dtome123/auth-sdk/jwtutils"
+	mongodb "github.com/dtome123/go-mongo-generic"
 	"github.com/redis/go-redis/v9"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
@@ -21,13 +18,13 @@ func main() {
 		panic(err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(
-		ctx,
-		options.Client().ApplyURI(cfg.DB.Mongo.DSN),
+	db, err := mongodb.NewDatabase(
+		mongodb.WithDatabase(cfg.DB.Mongo.Database),
+		mongodb.WithSingleURL(cfg.DB.Mongo.DSN),
 	)
-	db := client.Database(cfg.DB.Mongo.Database)
+	if err != nil {
+		panic(err)
+	}
 
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     cfg.Redis.Host + ":" + cfg.Redis.Port,

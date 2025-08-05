@@ -8,6 +8,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // UpdateRole updates an existing role document identified by role.ID.
@@ -26,6 +27,8 @@ func (repo *AuthorizationRepository) UpdateRole(ctx context.Context, role *model
 	filter := bson.M{"_id": objID}
 	update := bson.M{"$set": role}
 
-	_, err = repo.RoleCol.UpdateOne(ctx, filter, update)
+	err = repo.roleCol.UpdateSetOne(ctx, filter, update, &options.UpdateOptions{
+		Hint: "_id",
+	})
 	return err
 }

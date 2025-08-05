@@ -14,7 +14,7 @@ type ListPermissionPathsInput struct {
 }
 
 // ListPermissionPaths retrieves all permission paths, optionally filtered by domain list.
-func (r *AuthorizationRepository) ListPermissionPaths(ctx context.Context, input ListPermissionPathsInput) ([]models.PermissionPath, error) {
+func (r *AuthorizationRepository) ListPermissionPaths(ctx context.Context, input ListPermissionPathsInput) ([]*models.PermissionPath, error) {
 	filter := bson.M{}
 
 	if input.Keyword != "" {
@@ -30,13 +30,8 @@ func (r *AuthorizationRepository) ListPermissionPaths(ctx context.Context, input
 
 	opts := options.Find().SetHint(IdxPermissionPath)
 
-	cursor, err := r.PermissionPathCol.Find(ctx, filter, opts)
+	permissions, err := r.permissionPathCol.Find(ctx, filter, opts, nil)
 	if err != nil {
-		return nil, err
-	}
-
-	var permissions []models.PermissionPath
-	if err := cursor.All(ctx, &permissions); err != nil {
 		return nil, err
 	}
 

@@ -10,8 +10,8 @@ import (
 	"runtime/debug"
 
 	"github.com/dtome123/auth-sdk/jwtutils"
+	mongodb "github.com/dtome123/go-mongo-generic"
 	"github.com/redis/go-redis/v9"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Server struct {
@@ -22,7 +22,7 @@ type Server struct {
 	verifier        jwtutils.Verifier
 }
 
-func NewServer(cfg *config.Config, db *mongo.Database, redisClient *redis.Client, clientVerifiers map[string]types.ClientEntry) *Server {
+func NewServer(cfg *config.Config, db *mongodb.Database, redisClient *redis.Client, clientVerifiers map[string]types.ClientEntry) *Server {
 
 	var serverVerifier jwtutils.Verifier
 	var serverSigner jwtutils.Signer

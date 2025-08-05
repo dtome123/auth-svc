@@ -5,7 +5,7 @@ import (
 	"context"
 )
 
-func (svc *AuthorizationService) GetUserPermissions(ctx context.Context, userID string) ([]models.Permission, error) {
+func (svc *AuthorizationService) GetUserPermissions(ctx context.Context, userID string) ([]*models.Permission, error) {
 
 	if svc.cfg.Caching.Enable {
 		perms, err := svc.authorCache.GetPermissions(ctx, userID)

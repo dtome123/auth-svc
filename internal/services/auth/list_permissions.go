@@ -13,7 +13,7 @@ type ListPermissionsInput struct {
 	Keyword string
 }
 
-func (s *AuthorizationService) ListPermissions(ctx context.Context, input ListPermissionsInput) ([]models.Permission, error) {
+func (s *AuthorizationService) ListPermissions(ctx context.Context, input ListPermissionsInput) ([]*models.Permission, error) {
 
 	permissions, err := s.authorizationRepo.ListPermissions(ctx, author.ListPermissionsInput{
 		Domains: input.Domains,

@@ -15,7 +15,7 @@ type ListRoleInput struct {
 	PageLimit  int64
 }
 
-func (s *AuthorizationService) ListRole(ctx context.Context, input ListRoleInput) ([]models.Role, error) {
+func (s *AuthorizationService) ListRole(ctx context.Context, input ListRoleInput) ([]*models.Role, error) {
 
 	roles, err := s.authorizationRepo.ListRoles(ctx, author.ListRoleInput{
 		Keyword:    input.Keyword,

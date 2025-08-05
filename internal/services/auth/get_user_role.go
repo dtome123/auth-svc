@@ -5,7 +5,7 @@ import (
 	"context"
 )
 
-func (svc *AuthorizationService) GetUserRoles(ctx context.Context, userID string) ([]models.Role, error) {
+func (svc *AuthorizationService) GetUserRoles(ctx context.Context, userID string) ([]*models.Role, error) {
 
 	assignments, err := svc.authorizationRepo.GetAssignmentByUserID(ctx, userID)
 	if err != nil {

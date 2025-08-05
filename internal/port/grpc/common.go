@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func ToPermissionsProto(in []models.Permission) []*authPb.Permission {
+func ToPermissionsProto(in []*models.Permission) []*authPb.Permission {
 	var permissions []*authPb.Permission
 	for _, p := range in {
 
@@ -34,9 +34,14 @@ func ToPermissionsProto(in []models.Permission) []*authPb.Permission {
 	return permissions
 }
 
-func ToPermissionPathsProto(in []models.PermissionPath) []*authPb.PermissionPath {
+func ToPermissionPathsProto(in []*models.PermissionPath) []*authPb.PermissionPath {
 	var paths []*authPb.PermissionPath
 	for _, p := range in {
+
+		if p == nil {
+			continue
+		}
+
 		paths = append(paths, &authPb.PermissionPath{
 			Id:       p.ID.Hex(),
 			Domain:   p.Domain,
@@ -49,7 +54,11 @@ func ToPermissionPathsProto(in []models.PermissionPath) []*authPb.PermissionPath
 	return paths
 }
 
-func ToRoleProto(in models.Role) *authPb.Role {
+func ToRoleProto(in *models.Role) *authPb.Role {
+
+	if in == nil {
+		return nil
+	}
 
 	permissionIds := make([]string, len(in.PermissionIDs))
 	for i, permissionID := range in.PermissionIDs {
@@ -65,7 +74,7 @@ func ToRoleProto(in models.Role) *authPb.Role {
 	}
 }
 
-func ToListRoleProto(in []models.Role) []*authPb.Role {
+func ToListRoleProto(in []*models.Role) []*authPb.Role {
 	var roles []*authPb.Role
 	for _, r := range in {
 		roles = append(roles, ToRoleProto(r))

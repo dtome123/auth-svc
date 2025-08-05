@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func (repo *AuthorizationRepository) ListRolesByIDs(ctx context.Context, ids []primitive.ObjectID) ([]models.Role, error) {
+func (repo *AuthorizationRepository) ListRolesByIDs(ctx context.Context, ids []primitive.ObjectID) ([]*models.Role, error) {
 
 	filter := bson.M{
 		"_id": bson.M{
@@ -17,13 +17,10 @@ func (repo *AuthorizationRepository) ListRolesByIDs(ctx context.Context, ids []p
 		},
 	}
 
-	cursor, err := repo.RoleCol.Find(ctx, filter, &options.FindOptions{})
+	roles, err := repo.roleCol.Find(ctx, filter, &options.FindOptions{
+		Hint: "_id",
+	}, nil)
 	if err != nil {
-		return nil, err
-	}
-
-	var roles []models.Role
-	if err := cursor.All(ctx, &roles); err != nil {
 		return nil, err
 	}
 

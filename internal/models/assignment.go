@@ -7,3 +7,7 @@ type Assignment struct {
 	RoleIDs []primitive.ObjectID `bson:"role_id" json:"role_id"`
 	Roles   []Role               `json:"role" bson:"-"`
 }
+
+func (coll Assignment) CollectionName() string {
+	return "assignments"
+}

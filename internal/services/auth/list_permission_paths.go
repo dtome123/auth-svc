@@ -13,7 +13,7 @@ type ListPermissionPathsInput struct {
 	Keyword string
 }
 
-func (s *AuthorizationService) ListPermissionPaths(ctx context.Context, input ListPermissionPathsInput) ([]models.PermissionPath, error) {
+func (s *AuthorizationService) ListPermissionPaths(ctx context.Context, input ListPermissionPathsInput) ([]*models.PermissionPath, error) {
 
 	paths, err := s.authorizationRepo.ListPermissionPaths(ctx, author.ListPermissionPathsInput{
 		Domains: input.Domains,

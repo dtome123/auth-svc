@@ -17,7 +17,7 @@ type ListRoleInput struct {
 }
 
 // ListRoles retrieves roles from the database with pagination support by page number and page limit.
-func (repo *AuthorizationRepository) ListRoles(ctx context.Context, input ListRoleInput) ([]models.Role, error) {
+func (repo *AuthorizationRepository) ListRoles(ctx context.Context, input ListRoleInput) ([]*models.Role, error) {
 	skip, limit := utils.PaginationToSkipLimit(input.PageNumber, input.PageLimit)
 
 	findOpts := options.Find()
@@ -45,13 +45,8 @@ func (repo *AuthorizationRepository) ListRoles(ctx context.Context, input ListRo
 		}
 	}
 
-	cursor, err := repo.RoleCol.Find(ctx, filter, findOpts)
+	roles, err := repo.roleCol.Find(ctx, filter, findOpts, nil)
 	if err != nil {
-		return nil, err
-	}
-
-	var roles []models.Role
-	if err := cursor.All(ctx, &roles); err != nil {
 		return nil, err
 	}
 

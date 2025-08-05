@@ -16,6 +16,10 @@ type Permission struct {
 	ImpliedByActions []ActionResource   `bson:"implied_actions,omitempty" json:"implied_actions,omitempty"`
 }
 
+func (Permission) CollectionName() string {
+	return "permissions"
+}
+
 type ActionResource struct {
 	Resource string `bson:"resource" json:"resource"`
 	Action   string `bson:"action" json:"action"`
@@ -28,4 +32,8 @@ type PermissionPath struct {
 	Resource string             `bson:"resource" json:"resource"`
 	Action   string             `bson:"action" json:"action"`
 	Type     types.RouteScope   `bson:"type" json:"type"`
+}
+
+func (PermissionPath) CollectionName() string {
+	return "permission_paths"
 }

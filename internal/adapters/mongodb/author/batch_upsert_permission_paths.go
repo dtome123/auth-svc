@@ -7,6 +7,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // BatchUpsertPermissionPaths upserts a list of permission paths into the database.
@@ -24,7 +25,7 @@ func (repo *AuthorizationRepository) BatchUpsertPermissionPaths(ctx context.Cont
 		)
 	}
 
-	_, err := repo.PermissionPathCol.BulkWrite(ctx, models)
+	_, err := repo.permissionPathCol.BulkWrite(ctx, models, &options.BulkWriteOptions{})
 	if err != nil {
 		log.Printf("Failed to bulk upsert permission paths: %v", err)
 	}

@@ -11,12 +11,12 @@ import (
 )
 
 // GetPermissionsByUserID retrieves all permissions assigned to a user via their roles.
-func (repo *AuthorizationRepository) GetPermissionsByUserID(ctx context.Context, userID string) ([]models.Permission, error) {
+func (repo *AuthorizationRepository) GetPermissionsByUserID(ctx context.Context, userID string) ([]*models.Permission, error) {
 	// Get user's assignment (list of role IDs)
-	var assignment models.Assignment
-	err := repo.AssignmentCol.FindOne(ctx, bson.M{"user_id": userID},
+
+	assignment, err := repo.assignmentCol.FindOne(ctx, bson.M{"user_id": userID},
 		options.FindOne().SetHint(IdxAssignmentUserId),
-	).Decode(&assignment)
+	)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
@@ -31,12 +31,13 @@ func (repo *AuthorizationRepository) GetPermissionsByUserID(ctx context.Context,
 	}
 
 	// Find roles by IDs
-	roleCursor, err := repo.RoleCol.Find(ctx, bson.M{"_id": bson.M{"$in": assignment.RoleIDs}})
+	roles, err := repo.roleCol.Find(
+		ctx,
+		bson.M{"_id": bson.M{"$in": assignment.RoleIDs}},
+		options.Find().SetHint("_id_"),
+		nil,
+	)
 	if err != nil {
-		return nil, err
-	}
-	var roles []models.Role
-	if err := roleCursor.All(ctx, &roles); err != nil {
 		return nil, err
 	}
 
@@ -59,13 +60,13 @@ func (repo *AuthorizationRepository) GetPermissionsByUserID(ctx context.Context,
 	}
 
 	// Find permissions
-	cursor, err := repo.PermissionCol.Find(ctx, bson.M{"_id": bson.M{"$in": permissionIDs}})
+	permissions, err := repo.permissionCol.Find(
+		ctx,
+		bson.M{"_id": bson.M{"$in": permissionIDs}},
+		options.Find().SetHint("_id_"),
+		nil,
+	)
 	if err != nil {
-		return nil, err
-	}
-
-	var permissions []models.Permission
-	if err := cursor.All(ctx, &permissions); err != nil {
 		return nil, err
 	}
 

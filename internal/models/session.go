@@ -10,3 +10,7 @@ type Session struct {
 	RefreshTokenHash string    `bson:"refresh_token_hash" json:"refresh_token_hash"`
 	TTL              time.Time `bson:"ttl" json:"ttl"`
 }
+
+func (Session) CollectionName() string {
+	return "sessions"
+}

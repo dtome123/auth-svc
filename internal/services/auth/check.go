@@ -57,7 +57,7 @@ func (svc *AuthorizationService) Check(ctx context.Context, req CheckInput) (Che
 	}
 
 	// Validate session and token
-	if err := svc.validateSessionAndToken(ctx, userID, deviceID, req.AccessToken); err != nil {
+	if err := svc.validateSession(ctx, userID, deviceID, req.AccessToken); err != nil {
 		return checkUnauthorized("invalid token"), err
 	}
 
@@ -76,7 +76,7 @@ func (svc *AuthorizationService) Check(ctx context.Context, req CheckInput) (Che
 	return checkOK(), nil
 }
 
-func (svc *AuthorizationService) validateSessionAndToken(ctx context.Context, userID, deviceID, accessToken string) error {
+func (svc *AuthorizationService) validateSession(ctx context.Context, userID, deviceID, accessToken string) error {
 	accessTokenHash := utils.HashSHA256(accessToken)
 	session, err := svc.authenticationRepo.GetSession(ctx, userID, deviceID)
 	if err != nil {
@@ -87,10 +87,6 @@ func (svc *AuthorizationService) validateSessionAndToken(ctx context.Context, us
 	}
 	if session.AccessTokenHash != accessTokenHash {
 		return fmt.Errorf("invalid token")
-	}
-
-	if _, err := svc.serverVerifier.Verify(accessToken); err != nil {
-		return err
 	}
 
 	return nil

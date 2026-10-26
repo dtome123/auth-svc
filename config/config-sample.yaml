@@ -1,0 +1,94 @@
+# ==============================================================================
+# Auth Service (`auth-svc`) - Sample Configuration File
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Server Configuration
+# ------------------------------------------------------------------------------
+server:
+  http_port: 8080 # Port for HTTP REST Server (Public/Edge APIs)
+  grpc_port: 8081 # Port for gRPC Server (Internal inter-service communication)
+
+# ------------------------------------------------------------------------------
+# 2. Redis Configuration
+# ------------------------------------------------------------------------------
+redis:
+  host: localhost
+  port: 6379
+  pwd: pwd
+  database: 0
+
+# ------------------------------------------------------------------------------
+# 3. Database Configuration (MongoDB)
+# ------------------------------------------------------------------------------
+db:
+  mongo:
+    dsn: mongodb+srv://admin:password@localhost:27017/
+    database: auth-db
+
+# ------------------------------------------------------------------------------
+# 4. Caching Policy
+# ------------------------------------------------------------------------------
+caching:
+  enable: true
+  type: "redis" # Cache provider type: "redis", "memory" (In-Memory RAM), or "none" (disabled)
+  ttl: 5m       # TTL for cached RBAC authorization permissions
+
+# ------------------------------------------------------------------------------
+# 5. Authentication & OAuth Security Configuration
+# ------------------------------------------------------------------------------
+auth:
+  system_aud: "system.com" # System-wide Audience ID
+  external_envoy:
+    header: "authorization"
+    scheme: "bearer"
+  enable_replay_check: false # Enable/disable JWT Replay Attack checking
+
+  oauth:
+    # --------------------------------------------------------------------------
+    # 5.1 OAuth Server Keys (Used by Auth Server itself & gRPC Interceptors)
+    # --------------------------------------------------------------------------
+    aud: "auth-svc"         # Audience ID identifying this Auth Service itself
+    type: "hmac" # Server encryption algorithm type: "rsa" or "hmac"
+    hmac:
+      secret: "server-oauth-secret-key"
+    rsa:
+      private_key_path: cert/private.pem
+      public_key_path: cert/public.pem
+    access_token_ttl: 5m # Default TTL for M2M Access Tokens (Client Credentials grant)
+
+    # --------------------------------------------------------------------------
+    # 5.2 Default User Token Configuration (Fallback for all User Tokens)
+    # --------------------------------------------------------------------------
+    user_token_config:
+      type: "rsa" # "rsa" or "hmac"
+      access_token_ttl: 15d  # Default Access Token TTL for End-Users
+      refresh_token_ttl: 30d # Default Refresh Token TTL for End-Users
+      rsa:
+        private_key_path: cert/private.pem
+        public_key_path: cert/public.pem
+      hmac:
+        secret: "default-user-jwt-secret"
+
+    # --------------------------------------------------------------------------
+    # 5.3 M2M Clients & User Authentication Rules
+    # --------------------------------------------------------------------------
+    clients:
+      - name: "tenant-service"
+        # --- Machine-to-Machine (M2M) Configuration ---
+        type: "rsa" # Client M2M algorithm type: "rsa" or "hmac"
+        allowed_audiences:
+          - "*" # List of target service audiences (aud) this client can request tokens for ("*" = all)
+        secret_key: "tenant-m2m-secret" # Used if type is "hmac"
+        public_key: |
+          -----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz...
+          -----END PUBLIC KEY-----
+
+        # --- User Authentication Configuration ---
+        allow_user_authenticate: true # Enable/disable user token generation permission (inherits default_user_token_config)
+
+        # [Optional] Override TTL
+        # user_token_config:
+        #   access_token_ttl: 1d
+        #   refresh_token_ttl: 7d

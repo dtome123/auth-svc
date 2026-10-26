@@ -1,47 +1,46 @@
 package author
 
 import (
-	"context"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
-	IdxPermissionPath = "_idx_permission_path_"
-
-	IdxPermissionResourceAction = "_idx_permission_resource_action_"
-
-	IdxAssignmentUserId = "_idx_permission_user_id_"
+	IdxPermissionDomainResource = "_idx_permission_domain_resource_"
+	IdxAssignmentUserId         = "_idx_permission_user_id_"
 )
 
-func indexingPermissionPathCol(col *mongo.Collection) {
-
-	col.Indexes().CreateOne(context.Background(), mongo.IndexModel{
-		Keys: bson.M{
-			"path": 1,
+func GetPermissionIndexes() []mongo.IndexModel {
+	return []mongo.IndexModel{
+		{
+			Keys: bson.D{
+				{Key: "domain", Value: 1},
+				{Key: "resource", Value: 1},
+			},
+			Options: options.Index().SetName(IdxPermissionDomainResource).SetUnique(true),
 		},
-		Options: options.Index().SetName(IdxPermissionPath).SetUnique(true),
-	})
+	}
 }
 
-func indexingPermissionCol(col *mongo.Collection) {
-	col.Indexes().CreateOne(context.Background(), mongo.IndexModel{
-		Keys: bson.M{
-			"resource": 1,
-			"action":   1,
-			"domain":   1,
+func GetAssignmentIndexes() []mongo.IndexModel {
+	return []mongo.IndexModel{
+		{
+			Keys: bson.D{
+				{Key: "user_id", Value: 1},
+			},
+			Options: options.Index().SetName(IdxAssignmentUserId).SetUnique(true),
 		},
-		Options: options.Index().SetName(IdxPermissionResourceAction).SetUnique(true),
-	})
+	}
 }
 
-func indexingAssignmentCol(col *mongo.Collection) {
-	col.Indexes().CreateOne(context.Background(), mongo.IndexModel{
-		Keys: bson.M{
-			"user_id": 1,
+func GetRoleIndexes() []mongo.IndexModel {
+	return []mongo.IndexModel{
+		{
+			Keys: bson.D{
+				{Key: "name", Value: 1},
+			},
+			Options: options.Index().SetName("_idx_role_name_").SetUnique(true),
 		},
-		Options: options.Index().SetName(IdxAssignmentUserId),
-	})
+	}
 }

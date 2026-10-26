@@ -1,12 +1,30 @@
 package author
 
 import (
-	"auth-svc/internal/models"
+	mongoModels "auth-svc/internal/adapters/mongodb/models"
+	"auth-svc/internal/domain"
 	"context"
+	"errors"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (repo *AuthorizationRepository) CreateRole(ctx context.Context, role *models.Role) error {
-	_, err := repo.RoleCol.InsertOne(ctx, role)
+// CreateRole inserts a new role into the database.
+func (repo *AuthorizationRepository) CreateRole(ctx context.Context, role *domain.Role) error {
+	if role == nil {
+		return errors.New("role is nil")
+	}
 
-	return err
+	doc := mongoModels.RoleFromDomain(role)
+	if doc.ID.IsZero() {
+		doc.ID = primitive.NewObjectID()
+	}
+
+	err := repo.roleCol.InsertOne(ctx, *doc)
+	if err != nil {
+		return err
+	}
+
+	role.ID = doc.ID.Hex()
+	return nil
 }

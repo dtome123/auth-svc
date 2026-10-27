@@ -100,7 +100,8 @@ func (svc *AuthorizationService) Refresh(ctx context.Context, req RefreshInput) 
 	refreshTokenHash = utils.HashSHA256(idToken.RefreshToken)
 
 	// Persist session in the DB
-	go func() {
+	go func(ctx context.Context) {
+
 		if svc.sessionResource == nil {
 			fmt.Println("warning: sessionResource is nil")
 			return
@@ -120,7 +121,7 @@ func (svc *AuthorizationService) Refresh(ctx context.Context, req RefreshInput) 
 		if err != nil {
 			fmt.Println("❌ Error persisting session in the DB:", err)
 		}
-	}()
+	}(context.Background())
 
 	// Persist session in the DB
 	err = svc.sessionResource.UpsertSession(ctx, session.Session[domain.Session]{

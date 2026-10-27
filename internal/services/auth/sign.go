@@ -75,7 +75,7 @@ func (svc *AuthorizationService) Sign(ctx context.Context, req SignInput) (*Sign
 	refreshTokenHash := utils.HashSHA256(idToken.RefreshToken)
 
 	// Persist session in the DB
-	go func() {
+	go func(ctx context.Context) {
 		if svc.sessionResource == nil {
 			fmt.Println("warning: sessionResource is nil")
 			return
@@ -95,7 +95,7 @@ func (svc *AuthorizationService) Sign(ctx context.Context, req SignInput) (*Sign
 		if err != nil {
 			fmt.Println("❌ Error persisting session in the DB:", err)
 		}
-	}()
+	}(context.Background())
 
 	// Return tokens to client
 	return &SignOutput{

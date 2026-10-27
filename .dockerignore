@@ -1,2 +1,6 @@
-cert
+.git
+.gitignore
 .vscode
+cert
+__debug_bin*
+*.md

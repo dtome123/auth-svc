@@ -42,5 +42,11 @@ func GetRoleIndexes() []mongo.IndexModel {
 			},
 			Options: options.Index().SetName("_idx_role_name_").SetUnique(true),
 		},
+		{
+			Keys: bson.D{
+				{Key: "code", Value: 1},
+			},
+			Options: options.Index().SetName("_idx_role_code_").SetUnique(true).SetSparse(true),
+		},
 	}
 }

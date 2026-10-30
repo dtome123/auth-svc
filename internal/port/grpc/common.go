@@ -35,6 +35,17 @@ func ToPermissionsProto(in []*domain.Permission) []*authPb.Permission {
 	return permissions
 }
 
+func ToResourceActionsPermissionsProto(in []domain.ResourceAction) []*authPb.Permission {
+	var permissions []*authPb.Permission
+	for _, ra := range in {
+		permissions = append(permissions, &authPb.Permission{
+			Id:      ra.PermissionID,
+			Actions: ra.Actions,
+		})
+	}
+	return permissions
+}
+
 func ToRoleProto(in *domain.Role) *authPb.Role {
 	if in == nil {
 		return nil
@@ -81,20 +92,23 @@ func FromRoleProto(in *authPb.Role) *domain.Role {
 	if in == nil {
 		return nil
 	}
-	var permIDs []string
 	var perms []*domain.Permission
+	var ras []domain.ResourceAction
 	for _, p := range in.Permissions {
 		dPerm := FromPermissionProto(p)
 		perms = append(perms, dPerm)
 		if p.Id != "" {
-			permIDs = append(permIDs, p.Id)
+			ras = append(ras, domain.ResourceAction{
+				PermissionID: p.Id,
+				Actions:      p.Actions,
+			})
 		}
 	}
 	return &domain.Role{
-		ID:            in.Id,
-		Name:          in.Name,
-		PermissionIDs: permIDs,
-		Permissions:   perms,
-		Scope:         in.Scope,
+		ID:              in.Id,
+		Name:            in.Name,
+		ResourceActions: ras,
+		Permissions:     perms,
+		Scope:           in.Scope,
 	}
 }

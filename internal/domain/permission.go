@@ -9,3 +9,11 @@ type Permission struct {
 	Resource    string   `json:"resource"`
 	Actions     []string `json:"actions"`
 }
+
+// ListPermissionsInput defines filter criteria for querying permissions.
+type ListPermissionsInput struct {
+	Keyword    string
+	Domains    []string
+	PageNumber int64
+	PageLimit  int64
+}

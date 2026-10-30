@@ -12,7 +12,7 @@ import (
 )
 
 // GetRole retrieves a role by its ID (hex string).
-func (repo *AuthorizationRepository) GetRole(ctx context.Context, id string) (*domain.Role, error) {
+func (repo *impl) GetRole(ctx context.Context, id string) (*domain.Role, error) {
 
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {

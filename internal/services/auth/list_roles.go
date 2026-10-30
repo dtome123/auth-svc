@@ -17,8 +17,10 @@ func (s *AuthorizationService) ListRole(ctx context.Context, input ListRoleInput
 
 	allPermIDsSet := make(map[string]struct{})
 	for _, r := range roles {
-		for _, pid := range r.PermissionIDs {
-			allPermIDsSet[pid] = struct{}{}
+		for _, ra := range r.ResourceActions {
+			if ra.PermissionID != "" {
+				allPermIDsSet[ra.PermissionID] = struct{}{}
+			}
 		}
 	}
 	if len(allPermIDsSet) > 0 {
@@ -33,8 +35,8 @@ func (s *AuthorizationService) ListRole(ctx context.Context, input ListRoleInput
 				permsByID[p.ID] = p
 			}
 			for _, r := range roles {
-				for _, pid := range r.PermissionIDs {
-					if p, ok := permsByID[pid]; ok {
+				for _, ra := range r.ResourceActions {
+					if p, ok := permsByID[ra.PermissionID]; ok {
 						r.Permissions = append(r.Permissions, p)
 					}
 				}

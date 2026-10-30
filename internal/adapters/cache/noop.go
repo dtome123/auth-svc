@@ -11,11 +11,11 @@ func NewNoOpAuthorizationCacheRepository() AuthorizationCacheRepository {
 	return &NoOpAuthorizationCacheRepository{}
 }
 
-func (n *NoOpAuthorizationCacheRepository) GetPermissions(ctx context.Context, userID string) ([]*domain.Permission, error) {
+func (n *NoOpAuthorizationCacheRepository) GetPermissions(ctx context.Context, userID string) ([]domain.ResourceAction, error) {
 	return nil, nil
 }
 
-func (n *NoOpAuthorizationCacheRepository) SetPermissions(ctx context.Context, userID string, permissions []*domain.Permission) error {
+func (n *NoOpAuthorizationCacheRepository) SetPermissions(ctx context.Context, userID string, permissions []domain.ResourceAction) error {
 	return nil
 }
 

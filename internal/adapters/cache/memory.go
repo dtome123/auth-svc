@@ -31,21 +31,21 @@ func NewMemoryAuthorizationCacheRepository(durationTTL string) AuthorizationCach
 
 // === PERMISSIONS CACHE ===
 
-func (m *MemoryAuthorizationCacheRepository) GetPermissions(ctx context.Context, userID string) ([]*domain.Permission, error) {
+func (m *MemoryAuthorizationCacheRepository) GetPermissions(ctx context.Context, userID string) ([]domain.ResourceAction, error) {
 	cacheKey := BuildPermissionListCacheKey(userID)
 	val, found := m.client.Get(cacheKey)
 	if !found {
 		return nil, nil
 	}
 
-	if permissions, ok := val.([]*domain.Permission); ok {
+	if permissions, ok := val.([]domain.ResourceAction); ok {
 		return permissions, nil
 	}
 
 	return nil, nil
 }
 
-func (m *MemoryAuthorizationCacheRepository) SetPermissions(ctx context.Context, userID string, permissions []*domain.Permission) error {
+func (m *MemoryAuthorizationCacheRepository) SetPermissions(ctx context.Context, userID string, permissions []domain.ResourceAction) error {
 	cacheKey := BuildPermissionListCacheKey(userID)
 	m.client.Set(cacheKey, permissions, gocache.DefaultExpiration)
 	return nil

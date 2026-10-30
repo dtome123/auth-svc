@@ -10,7 +10,7 @@ import (
 )
 
 // UpsertAssignment updates an existing assignment for the user or inserts it if not exists.
-func (repo *AuthorizationRepository) UpsertAssignment(ctx context.Context, assignment *domain.Assignment) error {
+func (repo *impl) UpsertAssignment(ctx context.Context, assignment *domain.Assignment) error {
 	doc := mongoModels.AssignmentFromDomain(assignment)
 	updateOpts := options.Update().SetUpsert(true)
 

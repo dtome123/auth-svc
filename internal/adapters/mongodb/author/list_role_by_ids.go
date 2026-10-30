@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func (repo *AuthorizationRepository) ListRolesByIDs(ctx context.Context, ids []string) ([]*domain.Role, error) {
+func (repo *impl) ListRolesByIDs(ctx context.Context, ids []string) ([]*domain.Role, error) {
 	if len(ids) == 0 {
 		return nil, nil
 	}

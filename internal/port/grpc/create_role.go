@@ -10,21 +10,16 @@ import (
 
 func (s *GrpcServer) CreateRole(ctx context.Context, req *authPb.CreateRoleRequest) (*authPb.CreateRoleResponse, error) {
 	var ras []domain.ResourceAction
-	var permIDs []string
 	for _, ra := range req.GetResourceActions() {
 		ras = append(ras, domain.ResourceAction{
 			PermissionID: ra.GetPermissionId(),
 			Actions:      ra.GetActions(),
 		})
-		if ra.GetPermissionId() != "" {
-			permIDs = append(permIDs, ra.GetPermissionId())
-		}
 	}
-
 	id, err := s.svc.GetAuthService().CreateRole(ctx, auth.CreateRoleInput{
+		Code:            req.Code,
 		Name:            req.GetName(),
 		ResourceActions: ras,
-		PermissionIDs:   permIDs,
 		Description:     req.GetDescription(),
 		Scope:           req.GetScope(),
 	})

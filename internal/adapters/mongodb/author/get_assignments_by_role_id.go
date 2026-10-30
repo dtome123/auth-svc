@@ -9,7 +9,7 @@ import (
 )
 
 // GetAssignmentsByRoleID retrieves assignment documents containing a given role ID.
-func (repo *AuthorizationRepository) GetAssignmentsByRoleID(ctx context.Context, roleID string) ([]*domain.Assignment, error) {
+func (repo *impl) GetAssignmentsByRoleID(ctx context.Context, roleID string) ([]*domain.Assignment, error) {
 	objID, err := primitive.ObjectIDFromHex(roleID)
 	if err != nil {
 		return nil, nil

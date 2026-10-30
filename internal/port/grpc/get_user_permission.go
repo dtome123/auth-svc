@@ -14,6 +14,6 @@ func (s *GrpcServer) GetUserPermissions(ctx context.Context, req *authPb.GetUser
 	}
 
 	return &authPb.GetUserPermissionsResponse{
-		Permissions: ToPermissionsProto(res),
+		Permissions: ToResourceActionsPermissionsProto(res),
 	}, nil
 }

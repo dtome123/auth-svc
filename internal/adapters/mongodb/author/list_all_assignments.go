@@ -8,7 +8,7 @@ import (
 )
 
 // ListAllAssignments retrieves all user assignment documents from the database.
-func (repo *AuthorizationRepository) ListAllAssignments(ctx context.Context) ([]*domain.Assignment, error) {
+func (repo *impl) ListAllAssignments(ctx context.Context) ([]*domain.Assignment, error) {
 	docs, err := repo.assignmentCol.Find(ctx, bson.M{}, nil, nil)
 	if err != nil {
 		return nil, err

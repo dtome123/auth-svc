@@ -9,27 +9,18 @@ import (
 )
 
 type CreateRoleInput struct {
+	Code            string
 	Name            string
 	ResourceActions []domain.ResourceAction
-	PermissionIDs   []string
 	Description     string
 	Scope           map[string]string
 }
 
 func (svc *AuthorizationService) CreateRole(ctx context.Context, input CreateRoleInput) (string, error) {
-	permIDs := input.PermissionIDs
-	if len(permIDs) == 0 && len(input.ResourceActions) > 0 {
-		for _, ra := range input.ResourceActions {
-			if ra.PermissionID != "" {
-				permIDs = append(permIDs, ra.PermissionID)
-			}
-		}
-	}
-
 	role := &domain.Role{
+		Code:            input.Code,
 		Name:            input.Name,
 		ResourceActions: input.ResourceActions,
-		PermissionIDs:   permIDs,
 		Description:     input.Description,
 		Scope:           input.Scope,
 	}
@@ -37,7 +28,7 @@ func (svc *AuthorizationService) CreateRole(ctx context.Context, input CreateRol
 		return "", errors.Wrap(err, "failed to create role")
 	}
 
-	if err := svc.syncRolePoliciesInEnforcer(ctx, role.ID, role.Name, role.ResourceActions, permIDs); err != nil {
+	if err := svc.syncRolePoliciesInEnforcer(ctx, role.ID, role.Name, role.ResourceActions); err != nil {
 		fmt.Printf("failed to sync role policies in casbin enforcer: %v\n", err)
 	}
 

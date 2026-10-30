@@ -61,20 +61,15 @@ func (svc *AuthorizationService) syncRolePoliciesInEnforcer(
 	ctx context.Context,
 	roleID, roleName string,
 	resourceActions []domain.ResourceAction,
-	permissionIDs []string,
 ) error {
 	if svc.enforcer == nil {
 		return nil
 	}
 
 	var allPermIDs []string
-	if len(permissionIDs) > 0 {
-		allPermIDs = append(allPermIDs, permissionIDs...)
-	} else {
-		for _, ra := range resourceActions {
-			if ra.PermissionID != "" {
-				allPermIDs = append(allPermIDs, ra.PermissionID)
-			}
+	for _, ra := range resourceActions {
+		if ra.PermissionID != "" {
+			allPermIDs = append(allPermIDs, ra.PermissionID)
 		}
 	}
 
@@ -158,19 +153,6 @@ func buildRolePolicies(
 					}
 				}
 			}
-		} else {
-			for _, permID := range role.PermissionIDs {
-				perm, ok := permsByID[permID]
-				if !ok {
-					continue
-				}
-				for _, act := range perm.Actions {
-					policies = append(policies, []string{roleID, perm.Resource, act})
-					if role.Name != "" && role.Name != roleID {
-						policies = append(policies, []string{role.Name, perm.Resource, act})
-					}
-				}
-			}
 		}
 	}
 
@@ -188,8 +170,8 @@ func permissionsToCasbinPolicies(permissions []*domain.Permission) []casbinPkg.P
 	return result
 }
 
-// formatUserPermissions converts []*domain.Permission into a slice of deduplicated "resource:action" strings.
-func formatUserPermissions(permissions []*domain.Permission) []string {
+// formatUserPermissions converts []domain.ResourceAction into a slice of deduplicated "resource:action" strings.
+func formatUserPermissions(resourceActions []domain.ResourceAction) []string {
 	seen := make(map[string]struct{})
 	result := make([]string, 0)
 
@@ -204,12 +186,9 @@ func formatUserPermissions(permissions []*domain.Permission) []string {
 		}
 	}
 
-	for _, perm := range permissions {
-		if perm == nil {
-			continue
-		}
-		for _, act := range perm.Actions {
-			add(perm.Resource, act)
+	for _, ra := range resourceActions {
+		for _, act := range ra.Actions {
+			add(ra.PermissionID, act)
 		}
 	}
 

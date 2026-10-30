@@ -12,7 +12,7 @@ import (
 )
 
 // UpdateRole updates an existing role document identified by role.ID.
-func (repo *AuthorizationRepository) UpdateRole(ctx context.Context, role *domain.Role) error {
+func (repo *impl) UpdateRole(ctx context.Context, role *domain.Role) error {
 	if role == nil {
 		return errors.New("role is nil")
 	}

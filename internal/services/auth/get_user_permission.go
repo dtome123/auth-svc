@@ -5,7 +5,7 @@ import (
 	"context"
 )
 
-func (svc *AuthorizationService) GetUserPermissions(ctx context.Context, userID string) ([]*domain.Permission, error) {
+func (svc *AuthorizationService) GetUserPermissions(ctx context.Context, userID string) ([]domain.ResourceAction, error) {
 
 	if svc.cfg.Caching.Enable {
 		perms, err := svc.authorCache.GetPermissions(ctx, userID)
@@ -17,16 +17,16 @@ func (svc *AuthorizationService) GetUserPermissions(ctx context.Context, userID 
 		}
 	}
 
-	perms, err := svc.authorizationRepo.GetPermissionsByUserID(ctx, userID)
+	actionResources, err := svc.authorizationRepo.GetPermissionsByUserID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 
 	if svc.cfg.Caching.Enable {
-		if err := svc.authorCache.SetPermissions(ctx, userID, perms); err != nil {
+		if err := svc.authorCache.SetPermissions(ctx, userID, actionResources); err != nil {
 			return nil, err
 		}
 	}
 
-	return perms, nil
+	return actionResources, nil
 }

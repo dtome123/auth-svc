@@ -30,8 +30,8 @@ func NewRedisAuthorizationCacheRepository(redisClient *redis.Client, durationTTL
 // === PERMISSIONS CACHE ===
 //
 
-func (repo *RedisAuthorizationCacheRepository) GetPermissions(ctx context.Context, userID string) ([]*domain.Permission, error) {
-	var permissions []*domain.Permission
+func (repo *RedisAuthorizationCacheRepository) GetPermissions(ctx context.Context, userID string) ([]domain.ResourceAction, error) {
+	var permissions []domain.ResourceAction
 
 	cacheKey := BuildPermissionListCacheKey(userID)
 	cached, err := repo.Redis.Get(ctx, cacheKey).Result()
@@ -48,7 +48,7 @@ func (repo *RedisAuthorizationCacheRepository) GetPermissions(ctx context.Contex
 	return permissions, nil
 }
 
-func (repo *RedisAuthorizationCacheRepository) SetPermissions(ctx context.Context, userID string, permissions []*domain.Permission) error {
+func (repo *RedisAuthorizationCacheRepository) SetPermissions(ctx context.Context, userID string, permissions []domain.ResourceAction) error {
 	data, err := json.Marshal(permissions)
 	if err != nil {
 		return err

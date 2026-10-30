@@ -4,7 +4,7 @@ go 1.27.0
 
 require (
 	github.com/casbin/casbin/v2 v2.135.0
-	github.com/dtome123/auth-sdk v0.1.2-0.20261020170924-27576275c2bb
+	github.com/dtome123/auth-sdk v0.1.2-0.20261030150504-bc801b4e595a
 	github.com/dtome123/go-mongo-generic v0.0.0-20250805072324-aecc90b51c5b
 	github.com/envoyproxy/go-control-plane/envoy v1.32.4
 	github.com/gin-gonic/gin v1.10.1

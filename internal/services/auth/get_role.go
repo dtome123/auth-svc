@@ -16,10 +16,18 @@ func (svc *AuthorizationService) GetRole(ctx context.Context, roleID string) (*d
 		return nil, nil
 	}
 
-	if len(role.PermissionIDs) > 0 {
-		perms, err := svc.authorizationRepo.GetPermissionsByIDs(ctx, role.PermissionIDs)
-		if err == nil {
-			role.Permissions = perms
+	if len(role.ResourceActions) > 0 {
+		permIDs := make([]string, 0, len(role.ResourceActions))
+		for _, ra := range role.ResourceActions {
+			if ra.PermissionID != "" {
+				permIDs = append(permIDs, ra.PermissionID)
+			}
+		}
+		if len(permIDs) > 0 {
+			perms, err := svc.authorizationRepo.GetPermissionsByIDs(ctx, permIDs)
+			if err == nil {
+				role.Permissions = perms
+			}
 		}
 	}
 

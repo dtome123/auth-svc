@@ -3,6 +3,7 @@ package auth
 import (
 	"auth-svc/config"
 	"auth-svc/internal/adapters/cache"
+	"auth-svc/internal/adapters/mongodb/author"
 	"auth-svc/internal/domain"
 	"auth-svc/internal/types"
 	casbinPkg "auth-svc/tools/casbin"
@@ -23,7 +24,7 @@ type AuthorizationService struct {
 	serverVerifier      jwt.Verifier
 	defaultUserSigner   jwt.Signer
 	defaultUserVerifier jwt.Verifier
-	authorizationRepo   domain.AuthorizationRepository
+	authorizationRepo   author.AuthorizationRepository
 	sessionResource     session.Repository[domain.Session]
 	authorCache         cache.AuthorizationCacheRepository
 	oauthRelayChecker   assertion.ReplayChecker
@@ -34,7 +35,7 @@ func NewAuthorizationService(
 	cfg *config.Config,
 	serverSigner jwt.Signer,
 	serverVerifier jwt.Verifier,
-	authorizationRepo domain.AuthorizationRepository,
+	authorizationRepo author.AuthorizationRepository,
 	sessionResource session.Repository[domain.Session],
 	authorCache cache.AuthorizationCacheRepository,
 	oauthRelayChecker assertion.ReplayChecker,

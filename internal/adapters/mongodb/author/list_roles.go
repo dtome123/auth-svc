@@ -9,10 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type ListRoleInput = domain.ListRoleInput
-
 // ListRoles retrieves roles from the database with pagination support by page number and page limit.
-func (repo *AuthorizationRepository) ListRoles(ctx context.Context, input domain.ListRoleInput) ([]*domain.Role, error) {
+func (repo *impl) ListRoles(ctx context.Context, input domain.ListRoleInput) ([]*domain.Role, error) {
 	skip, limit := utils.PaginationToSkipLimit(input.PageNumber, input.PageLimit)
 
 	findOpts := options.Find()

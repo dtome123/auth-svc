@@ -10,7 +10,7 @@ import (
 )
 
 // CreateRole inserts a new role into the database.
-func (repo *AuthorizationRepository) CreateRole(ctx context.Context, role *domain.Role) error {
+func (repo *impl) CreateRole(ctx context.Context, role *domain.Role) error {
 	if role == nil {
 		return errors.New("role is nil")
 	}

@@ -10,7 +10,7 @@ import (
 )
 
 // GetAssignmentByUserID retrieves the assignment document associated with a given user ID.
-func (repo *AuthorizationRepository) GetAssignmentByUserID(ctx context.Context, userID string) (*domain.Assignment, error) {
+func (repo *impl) GetAssignmentByUserID(ctx context.Context, userID string) (*domain.Assignment, error) {
 
 	assignmentDoc, err := repo.assignmentCol.FindOne(ctx, bson.M{"user_id": userID},
 		options.FindOne().SetHint(IdxAssignmentUserId),

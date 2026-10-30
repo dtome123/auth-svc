@@ -12,7 +12,7 @@ import (
 )
 
 // BatchUpsertPermissions upserts a list of permissions into the database.
-func (repo *AuthorizationRepository) BatchUpsertPermissions(ctx context.Context, permissions []*domain.Permission) error {
+func (repo *impl) BatchUpsertPermissions(ctx context.Context, permissions []*domain.Permission) error {
 	if len(permissions) == 0 {
 		return nil
 	}

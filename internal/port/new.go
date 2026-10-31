@@ -27,6 +27,8 @@ type Server struct {
 	clientVerifiers map[string]types.ClientEntry
 	signer          jwt.Signer
 	verifier        jwt.Verifier
+	userSigner      jwt.Signer
+	userVerifier    jwt.Verifier
 	sessionResource session.Repository[domain.Session]
 }
 
@@ -52,12 +54,33 @@ func NewServer(cfg *config.Config, db *mongodb.Database, redisClient *redis.Clie
 		}
 	}
 
+	var userSigner jwt.Signer
+	var userVerifier jwt.Verifier
+	var err error
+	userConfig := cfg.AuthConfig.Oauth.UserTokenConfig
+	switch userConfig.Type {
+	case types.AuthUserTypeHMAC:
+		userSigner = jwt.NewHMACSigner([]byte(userConfig.HMAC.Secret))
+		userVerifier = jwt.NewHMACVerifier([]byte(userConfig.HMAC.Secret))
+	case types.AuthUserTypeRSA:
+		userSigner, err = jwt.NewRS256SignerFromPath(userConfig.RSA.PrivateKeyPath)
+		if err != nil {
+			log.Fatalf("Invalid RSA private key for user token: %v", err)
+		}
+		userVerifier, err = jwt.NewRS256VerifierFromPath(userConfig.RSA.PublicKeyPath)
+		if err != nil {
+			log.Fatalf("Invalid RSA public key for user token: %v", err)
+		}
+	}
+
 	return &Server{
 		cfg:             cfg,
-		svc:             services.NewService(cfg, db, redisClient, clientVerifiers, serverSigner, serverVerifier, sessionResource),
+		svc:             services.NewService(cfg, db, redisClient, clientVerifiers, serverSigner, serverVerifier, userSigner, userVerifier, sessionResource),
 		clientVerifiers: clientVerifiers,
 		signer:          serverSigner,
 		verifier:        serverVerifier,
+		userSigner:      userSigner,
+		userVerifier:    userVerifier,
 		sessionResource: sessionResource,
 	}
 }

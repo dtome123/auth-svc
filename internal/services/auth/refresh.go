@@ -65,7 +65,7 @@ func (svc *AuthorizationService) Refresh(ctx context.Context, req RefreshInput) 
 
 	accessTTLStr := svc.cfg.AuthConfig.Oauth.UserTokenConfig.AccessTokenTTL
 	refreshTTLStr := svc.cfg.AuthConfig.Oauth.UserTokenConfig.RefreshTokenTTL
-	signer := svc.defaultUserSigner
+	signer := svc.userSigner
 
 	if hasClient {
 		if clientEntry.AccessTokenTTL != "" {
@@ -73,9 +73,6 @@ func (svc *AuthorizationService) Refresh(ctx context.Context, req RefreshInput) 
 		}
 		if clientEntry.RefreshTokenTTL != "" {
 			refreshTTLStr = clientEntry.RefreshTokenTTL
-		}
-		if clientEntry.UserSigner != nil {
-			signer = clientEntry.UserSigner
 		}
 	}
 

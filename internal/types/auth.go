@@ -25,7 +25,6 @@ type ClientEntry struct {
 	AccessTokenTTL        string
 	RefreshTokenTTL       string
 
-	Verifier     jwt.Verifier
-	UserSigner   jwt.Signer
-	UserVerifier jwt.Verifier
+	Verifier jwt.Verifier
+	Signer   jwt.Signer
 }

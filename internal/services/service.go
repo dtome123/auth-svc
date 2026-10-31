@@ -39,6 +39,8 @@ func NewService(
 	clientVerifiers map[string]types.ClientEntry,
 	serverSigner jwt.Signer,
 	serverVerifier jwt.Verifier,
+	userSigner jwt.Signer,
+	userVerifier jwt.Verifier,
 	sessionResource session.Repository[domain.Session],
 ) *Service {
 
@@ -74,6 +76,8 @@ func NewService(
 			cfg,
 			serverSigner,
 			serverVerifier,
+			userSigner,
+			userVerifier,
 			authorRepo,
 			sessionResource,
 			authorCacheRepo,

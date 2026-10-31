@@ -35,9 +35,6 @@ func (svc *AuthorizationService) Sign(ctx context.Context, req SignInput) (*Sign
 	if !ok {
 		return nil, fmt.Errorf("client %q is not whitelisted", req.ClientID)
 	}
-	if clientEntry.UserSigner == nil {
-		return nil, fmt.Errorf("client %q does not have user signer configured", req.ClientID)
-	}
 
 	// Parse durations from config
 	accessTTL, err := utils.ParseFlexibleDuration(clientEntry.AccessTokenTTL)
@@ -48,7 +45,7 @@ func (svc *AuthorizationService) Sign(ctx context.Context, req SignInput) (*Sign
 	if err != nil {
 		return nil, err
 	}
-	signer := clientEntry.UserSigner
+	signer := svc.userSigner
 
 	// Get user permissions
 	userPermissions, err := svc.GetUserPermissions(ctx, req.UserID)

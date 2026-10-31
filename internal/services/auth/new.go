@@ -18,23 +18,25 @@ import (
 )
 
 type AuthorizationService struct {
-	cfg                 *config.Config
-	clients             map[string]types.ClientEntry
-	serverSigner        jwt.Signer
-	serverVerifier      jwt.Verifier
-	defaultUserSigner   jwt.Signer
-	defaultUserVerifier jwt.Verifier
-	authorizationRepo   author.AuthorizationRepository
-	sessionResource     session.Repository[domain.Session]
-	authorCache         cache.AuthorizationCacheRepository
-	oauthRelayChecker   assertion.ReplayChecker
-	enforcer            casbinPkg.Enforcer
+	cfg               *config.Config
+	clients           map[string]types.ClientEntry
+	serverSigner      jwt.Signer
+	serverVerifier    jwt.Verifier
+	userSigner        jwt.Signer
+	userVerifier      jwt.Verifier
+	authorizationRepo author.AuthorizationRepository
+	sessionResource   session.Repository[domain.Session]
+	authorCache       cache.AuthorizationCacheRepository
+	oauthRelayChecker assertion.ReplayChecker
+	enforcer          casbinPkg.Enforcer
 }
 
 func NewAuthorizationService(
 	cfg *config.Config,
 	serverSigner jwt.Signer,
 	serverVerifier jwt.Verifier,
+	userSigner jwt.Signer,
+	userVerifier jwt.Verifier,
 	authorizationRepo author.AuthorizationRepository,
 	sessionResource session.Repository[domain.Session],
 	authorCache cache.AuthorizationCacheRepository,
@@ -42,27 +44,6 @@ func NewAuthorizationService(
 	clientVerifiers map[string]types.ClientEntry,
 	redisClient *redis.Client,
 ) *AuthorizationService {
-
-	var defaultUserSigner jwt.Signer
-	var defaultUserVerifier jwt.Verifier
-	defaultCfg := cfg.AuthConfig.Oauth.UserTokenConfig
-	if !defaultCfg.IsEmpty() {
-		switch defaultCfg.Type {
-		case types.AuthUserTypeHMAC:
-			defaultUserSigner = jwt.NewHMACSigner([]byte(defaultCfg.HMAC.Secret))
-			defaultUserVerifier = jwt.NewHMACVerifier([]byte(defaultCfg.HMAC.Secret))
-		case types.AuthUserTypeRSA:
-			var err error
-			defaultUserSigner, err = jwt.NewRS256SignerFromPath(defaultCfg.RSA.PrivateKeyPath)
-			if err != nil {
-				panic(err)
-			}
-			defaultUserVerifier, err = jwt.NewRS256VerifierFromPath(defaultCfg.RSA.PublicKeyPath)
-			if err != nil {
-				panic(err)
-			}
-		}
-	}
 
 	// Initialize Casbin enforcer
 	casbinCfg := casbinPkg.Config{
@@ -80,17 +61,17 @@ func NewAuthorizationService(
 	}
 
 	svc := &AuthorizationService{
-		cfg:                 cfg,
-		clients:             clientVerifiers,
-		serverSigner:        serverSigner,
-		serverVerifier:      serverVerifier,
-		defaultUserSigner:   defaultUserSigner,
-		defaultUserVerifier: defaultUserVerifier,
-		sessionResource:     sessionResource,
-		authorizationRepo:   authorizationRepo,
-		authorCache:         authorCache,
-		oauthRelayChecker:   oauthRelayChecker,
-		enforcer:            enforcer,
+		cfg:               cfg,
+		clients:           clientVerifiers,
+		serverSigner:      serverSigner,
+		serverVerifier:    serverVerifier,
+		userSigner:        userSigner,
+		userVerifier:      userVerifier,
+		sessionResource:   sessionResource,
+		authorizationRepo: authorizationRepo,
+		authorCache:       authorCache,
+		oauthRelayChecker: oauthRelayChecker,
+		enforcer:          enforcer,
 	}
 
 	// Register reload callback and start subscriber goroutine

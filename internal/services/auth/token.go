@@ -41,12 +41,14 @@ func (svc *AuthorizationService) Token(ctx context.Context, req TokenInput) (*To
 		return nil, errors.Wrap(err, "failed to verify client assertion signature")
 	}
 
+	signer := svc.serverSigner
 	// Convert to oauth claims and validate core fields (aud, exp, jti, etc.)
 	if oauthClaims.Aud != svc.cfg.AuthConfig.Oauth.Aud {
 		audience, ok := svc.clients[oauthClaims.Aud]
 		if !ok || (!audience.AllowAudiences["*"] && !audience.AllowAudiences[oauthClaims.Iss]) {
 			return nil, errors.New("unauthorized audience for client")
 		}
+		signer = audience.Signer
 	}
 
 	opts := []jwt.ValidateOption{}
@@ -63,7 +65,7 @@ func (svc *AuthorizationService) Token(ctx context.Context, req TokenInput) (*To
 		return nil, errors.Wrap(err, "invalid access token TTL")
 	}
 	claims.Set("jti", uuid.New().String())
-	token, err := svc.serverSigner.Sign(claims, accessTTL)
+	token, err := signer.Sign(claims, accessTTL)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to sign access token")
 	}

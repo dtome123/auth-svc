@@ -5,7 +5,7 @@ import (
 	"auth-svc/internal/domain"
 	"auth-svc/internal/port"
 	"auth-svc/internal/types"
-	"fmt"
+	"log"
 
 	"github.com/dtome123/auth-sdk/jwt"
 	"github.com/dtome123/auth-sdk/session"
@@ -51,37 +51,25 @@ func newClientVerifiers(authConfig config.AuthConfig) map[string]types.ClientEnt
 
 	for _, svc := range authConfig.Oauth.Clients {
 		var verifier jwt.Verifier
+		var signer jwt.Signer
 		var err error
 
 		switch svc.Type {
 		case types.AuthM2MTypeRSA:
 			verifier, err = jwt.NewRS256VerifierFromString(svc.PublicKey)
 			if err != nil {
-				panic(fmt.Sprintf("Invalid RSA key for client %q: %v", svc.Name, err))
+				log.Fatalf("Invalid RSA key for client %q: %v", svc.Name, err)
+
+			}
+			signer, err = jwt.NewRS256SignerFromString(svc.SecretKey)
+			if err != nil {
+				log.Fatalf("Invalid RSA key for client %q: %v", svc.Name, err)
 			}
 		case types.AuthM2MTypeHMAC:
 			verifier = jwt.NewHMACVerifier([]byte(svc.SecretKey))
+			signer = jwt.NewHMACSigner([]byte(svc.SecretKey))
 		default:
-			panic(fmt.Sprintf("Unsupported auth type %q for client %q", svc.Type, svc.Name))
-		}
-
-		var userSigner jwt.Signer
-		var userVerifier jwt.Verifier
-		if svc.UserTokenConfig != nil && !svc.UserTokenConfig.IsEmpty() {
-			switch svc.UserTokenConfig.Type {
-			case types.AuthUserTypeHMAC:
-				userSigner = jwt.NewHMACSigner([]byte(svc.UserTokenConfig.HMAC.Secret))
-				userVerifier = jwt.NewHMACVerifier([]byte(svc.UserTokenConfig.HMAC.Secret))
-			case types.AuthUserTypeRSA:
-				userSigner, err = jwt.NewRS256SignerFromPath(svc.UserTokenConfig.RSA.PrivateKeyPath)
-				if err != nil {
-					panic(fmt.Sprintf("Invalid RSA private key for client %q: %v", svc.Name, err))
-				}
-				userVerifier, err = jwt.NewRS256VerifierFromPath(svc.UserTokenConfig.RSA.PublicKeyPath)
-				if err != nil {
-					panic(fmt.Sprintf("Invalid RSA public key for client %q: %v", svc.Name, err))
-				}
-			}
+			log.Fatalf("Unsupported auth type %q for client %q", svc.Type, svc.Name)
 		}
 
 		var accessTokenTTL string
@@ -103,9 +91,8 @@ func newClientVerifiers(authConfig config.AuthConfig) map[string]types.ClientEnt
 			AllowAudiences:        allowAudiences,
 			AccessTokenTTL:        accessTokenTTL,
 			RefreshTokenTTL:       refreshTokenTTL,
+			Signer:                signer,
 			Verifier:              verifier,
-			UserSigner:            userSigner,
-			UserVerifier:          userVerifier,
 		}
 	}
 

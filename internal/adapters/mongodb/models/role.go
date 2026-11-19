@@ -9,6 +9,7 @@ import (
 type ResourceAction struct {
 	PermissionID string   `bson:"permission_id" json:"permission_id"`
 	Actions      []string `bson:"actions" json:"actions"`
+	Scopes       []string `bson:"scopes,omitempty" json:"scopes,omitempty"`
 }
 
 type Role struct {
@@ -37,6 +38,7 @@ func (r *Role) ToDomain() *domain.Role {
 			ras[i] = domain.ResourceAction{
 				PermissionID: ra.PermissionID,
 				Actions:      ra.Actions,
+				Scopes:       ra.Scopes,
 			}
 		}
 	}
@@ -72,8 +74,8 @@ func RoleFromDomain(r *domain.Role) *Role {
 		ras = append(ras, ResourceAction{
 			PermissionID: ra.PermissionID,
 			Actions:      ra.Actions,
+			Scopes:       ra.Scopes,
 		})
-
 	}
 
 	var perms []*Permission

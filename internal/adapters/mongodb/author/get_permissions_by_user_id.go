@@ -46,6 +46,7 @@ func (repo *impl) GetPermissionsByUserID(ctx context.Context, userID string) ([]
 				actions = append(actions, domain.ResourceAction{
 					PermissionID: ra.PermissionID,
 					Actions:      ra.Actions,
+					Scopes:       ra.Scopes,
 				})
 			}
 		}

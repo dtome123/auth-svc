@@ -14,6 +14,7 @@ func (s *GrpcServer) CreateRole(ctx context.Context, req *authPb.CreateRoleReque
 		ras = append(ras, domain.ResourceAction{
 			PermissionID: ra.GetPermissionId(),
 			Actions:      ra.GetActions(),
+			Scopes:       ra.GetScopes(),
 		})
 	}
 	id, err := s.svc.GetAuthService().CreateRole(ctx, auth.CreateRoleInput{

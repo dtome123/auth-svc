@@ -4,6 +4,7 @@ package domain
 type ResourceAction struct {
 	PermissionID string   `json:"permission_id"`
 	Actions      []string `json:"actions"`
+	Scopes       []string `json:"scopes,omitempty"`
 }
 
 // Role represents an authorization role containing a set of permissions.

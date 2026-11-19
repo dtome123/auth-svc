@@ -5,6 +5,7 @@ import (
 	casbinPkg "auth-svc/tools/casbin"
 	"context"
 	"fmt"
+	"sort"
 )
 
 // LoadAllPolicies fetches all roles and permissions from repository
@@ -194,3 +195,39 @@ func formatUserPermissions(resourceActions []domain.ResourceAction) []string {
 
 	return result
 }
+
+// formatUserScopes extracts effective scopes from resource actions.
+// Returns both a list of "resource:scope" strings and a map of resource -> highest scope.
+func formatUserScopes(resourceActions []domain.ResourceAction) ([]string, map[string]string) {
+	scopePriority := map[string]int{
+		"personal": 1,
+		"self":     1,
+		"own":      1,
+		"tenant":   2,
+		"team":     2,
+		"all":      3,
+	}
+
+	bestScope := make(map[string]string)
+	for _, ra := range resourceActions {
+		res := ra.PermissionID
+		for _, sc := range ra.Scopes {
+			if sc == "" {
+				continue
+			}
+			curr, exists := bestScope[res]
+			if !exists || scopePriority[sc] > scopePriority[curr] {
+				bestScope[res] = sc
+			}
+		}
+	}
+
+	var scopeList []string
+	for res, sc := range bestScope {
+		scopeList = append(scopeList, fmt.Sprintf("%s:%s", res, sc))
+	}
+	sort.Strings(scopeList)
+
+	return scopeList, bestScope
+}
+

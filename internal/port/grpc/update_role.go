@@ -14,6 +14,7 @@ func (s *GrpcServer) UpdateRole(ctx context.Context, req *authPb.UpdateRoleReque
 		ras = append(ras, domain.ResourceAction{
 			PermissionID: ra.GetPermissionId(),
 			Actions:      ra.GetActions(),
+			Scopes:       ra.GetScopes(),
 		})
 	}
 

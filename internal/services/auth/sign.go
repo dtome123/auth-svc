@@ -47,12 +47,13 @@ func (svc *AuthorizationService) Sign(ctx context.Context, req SignInput) (*Sign
 	}
 	signer := svc.userSigner
 
-	// Get user permissions
+	// Get user permissions and scopes
 	userPermissions, err := svc.GetUserPermissions(ctx, req.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user permissions: %w", err)
 	}
 	permissions := formatUserPermissions(userPermissions)
+	scopeList, scopeMap := formatUserScopes(userPermissions)
 
 	// Access token claims
 	claims := jwt.NewClaims(req.Claim)
@@ -60,6 +61,8 @@ func (svc *AuthorizationService) Sign(ctx context.Context, req SignInput) (*Sign
 	claims.Set("sub", req.UserID)
 	claims.Set("exp", time.Now().Add(accessTTL).Unix())
 	claims.Set("permissions", permissions)
+	claims.Set("scopes", scopeList)
+	claims.Set("scope_map", scopeMap)
 
 	tokenBuilder := token.NewTokenBuilder(claims, accessTTL, refreshTTL, signer)
 

@@ -42,6 +42,7 @@ func ToResourceActionsPermissionsProto(in []domain.ResourceAction) []*authPb.Per
 		permissions = append(permissions, &authPb.Permission{
 			Id:      ra.PermissionID,
 			Actions: ra.Actions,
+			Scopes:  ra.Scopes,
 		})
 	}
 	return permissions
@@ -103,6 +104,7 @@ func FromRoleProto(in *authPb.Role) *domain.Role {
 			ras = append(ras, domain.ResourceAction{
 				PermissionID: p.Id,
 				Actions:      p.Actions,
+				Scopes:       p.Scopes,
 			})
 		}
 	}

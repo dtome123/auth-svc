@@ -96,8 +96,8 @@ docker-push:
 docker-build-push: docker-build docker-push
 
 ## Aliases
-build-docker: docker-build
-push-docker: docker-push
+build: docker-build
+push: docker-push
 
 # ===============================
 # Clean all

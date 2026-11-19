@@ -29,6 +29,7 @@ func ToPermissionsProto(in []*domain.Permission) []*authPb.Permission {
 			Domain:   p.Domain,
 			Resource: p.Resource,
 			Actions:  p.Actions,
+			Scopes:   p.Scopes,
 		})
 	}
 
@@ -77,6 +78,7 @@ func FromPermissionProto(in *authPb.Permission) *domain.Permission {
 		Domain:   in.Domain,
 		Resource: in.Resource,
 		Actions:  in.Actions,
+		Scopes:   in.Scopes,
 	}
 }
 

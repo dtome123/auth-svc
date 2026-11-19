@@ -8,6 +8,7 @@ type Permission struct {
 	Description string   `json:"description,omitempty"`
 	Resource    string   `json:"resource"`
 	Actions     []string `json:"actions"`
+	Scopes      []string `json:"scopes,omitempty"`
 }
 
 // ListPermissionsInput defines filter criteria for querying permissions.

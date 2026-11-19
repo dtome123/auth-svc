@@ -11,6 +11,7 @@ type Permission struct {
 	Description string   `bson:"description,omitempty" json:"description,omitempty"`
 	Resource    string   `bson:"resource" json:"resource"`
 	Actions     []string `bson:"actions" json:"actions"`
+	Scopes      []string `bson:"scopes,omitempty" json:"scopes,omitempty"`
 }
 
 func (Permission) CollectionName() string {
@@ -28,6 +29,7 @@ func (p *Permission) ToDomain() *domain.Permission {
 		Description: p.Description,
 		Resource:    p.Resource,
 		Actions:     p.Actions,
+		Scopes:      p.Scopes,
 	}
 }
 
@@ -42,5 +44,6 @@ func PermissionFromDomain(p *domain.Permission) *Permission {
 		Description: p.Description,
 		Resource:    p.Resource,
 		Actions:     p.Actions,
+		Scopes:      p.Scopes,
 	}
 }

@@ -54,11 +54,24 @@ func ToRoleProto(in *domain.Role) *authPb.Role {
 	}
 
 	return &authPb.Role{
-		Id:          in.ID,
-		Name:        in.Name,
-		Permissions: ToPermissionsProto(in.Permissions),
-		Scope:       in.Scope,
+		Id:              in.ID,
+		Name:            in.Name,
+		Code:            in.Code,
+		Scope:           in.Scope,
+		ResourceActions: ToListResourceActionsProto(in.ResourceActions),
 	}
+}
+
+func ToListResourceActionsProto(in []domain.ResourceAction) []*authPb.ResourceAction {
+	var actions []*authPb.ResourceAction
+	for _, ra := range in {
+		actions = append(actions, &authPb.ResourceAction{
+			PermissionId: ra.PermissionID,
+			Actions:      ra.Actions,
+			Scopes:       ra.Scopes,
+		})
+	}
+	return actions
 }
 
 func ToListRoleProto(in []*domain.Role) []*authPb.Role {
@@ -95,24 +108,24 @@ func FromRoleProto(in *authPb.Role) *domain.Role {
 	if in == nil {
 		return nil
 	}
-	var perms []*domain.Permission
-	var ras []domain.ResourceAction
-	for _, p := range in.Permissions {
-		dPerm := FromPermissionProto(p)
-		perms = append(perms, dPerm)
-		if p.Id != "" {
-			ras = append(ras, domain.ResourceAction{
-				PermissionID: p.Id,
-				Actions:      p.Actions,
-				Scopes:       p.Scopes,
-			})
-		}
-	}
+
 	return &domain.Role{
 		ID:              in.Id,
 		Name:            in.Name,
-		ResourceActions: ras,
-		Permissions:     perms,
+		Code:            in.Code,
 		Scope:           in.Scope,
+		ResourceActions: FromListResourceActionsProto(in.ResourceActions),
 	}
+}
+
+func FromListResourceActionsProto(in []*authPb.ResourceAction) []domain.ResourceAction {
+	var actions []domain.ResourceAction
+	for _, ra := range in {
+		actions = append(actions, domain.ResourceAction{
+			PermissionID: ra.PermissionId,
+			Actions:      ra.Actions,
+			Scopes:       ra.Scopes,
+		})
+	}
+	return actions
 }

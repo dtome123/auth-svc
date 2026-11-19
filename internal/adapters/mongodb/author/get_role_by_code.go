@@ -10,10 +10,19 @@ import (
 )
 
 // GetRoleByCode retrieves a role by its code.
-func (repo *impl) GetRoleByCode(ctx context.Context, code string) (*domain.Role, error) {
+func (repo *impl) GetRoleByCode(ctx context.Context, code string, scope map[string][]string) (*domain.Role, error) {
+	filter := bson.M{"code": code}
+
+	for k, v := range scope {
+		if len(v) == 0 {
+			continue
+		}
+		filter["scope."+k] = bson.M{"$in": v}
+	}
+
 	roleDoc, err := repo.roleCol.FindOne(
 		ctx,
-		bson.M{"code": code},
+		filter,
 		options.FindOne(),
 	)
 	if err != nil {

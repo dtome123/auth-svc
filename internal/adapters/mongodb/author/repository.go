@@ -11,7 +11,7 @@ type AuthorizationRepository interface {
 	CreateRole(ctx context.Context, role *domain.Role) error
 	UpdateRole(ctx context.Context, role *domain.Role) error
 	GetRole(ctx context.Context, id string) (*domain.Role, error)
-	GetRoleByCode(ctx context.Context, code string) (*domain.Role, error)
+	GetRoleByCode(ctx context.Context, code string, scope map[string][]string) (*domain.Role, error)
 	ListRoles(ctx context.Context, input domain.ListRoleInput) ([]*domain.Role, error)
 	ListRolesByIDs(ctx context.Context, ids []string) ([]*domain.Role, error)
 

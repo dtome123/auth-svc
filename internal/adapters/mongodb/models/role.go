@@ -17,7 +17,6 @@ type Role struct {
 	Code            string             `bson:"code,omitempty" json:"code,omitempty"`
 	Name            string             `bson:"name" json:"name"`
 	ResourceActions []ResourceAction   `bson:"resource_actions,omitempty" json:"resource_actions,omitempty"`
-	Permissions     []*Permission      `bson:"-" json:"permissions"`
 	Description     string             `bson:"description" json:"description"`
 	Scope           map[string]string  `bson:"scope" json:"scope"`
 }
@@ -43,20 +42,11 @@ func (r *Role) ToDomain() *domain.Role {
 		}
 	}
 
-	var perms []*domain.Permission
-	if len(r.Permissions) > 0 {
-		perms = make([]*domain.Permission, len(r.Permissions))
-		for i, p := range r.Permissions {
-			perms[i] = p.ToDomain()
-		}
-	}
-
 	return &domain.Role{
 		ID:              r.ID.Hex(),
 		Code:            r.Code,
 		Name:            r.Name,
 		ResourceActions: ras,
-		Permissions:     perms,
 		Description:     r.Description,
 		Scope:           r.Scope,
 	}
@@ -78,20 +68,11 @@ func RoleFromDomain(r *domain.Role) *Role {
 		})
 	}
 
-	var perms []*Permission
-	if len(r.Permissions) > 0 {
-		perms = make([]*Permission, len(r.Permissions))
-		for i, p := range r.Permissions {
-			perms[i] = PermissionFromDomain(p)
-		}
-	}
-
 	return &Role{
 		ID:              objID,
 		Code:            r.Code,
 		Name:            r.Name,
 		ResourceActions: ras,
-		Permissions:     perms,
 		Description:     r.Description,
 		Scope:           r.Scope,
 	}

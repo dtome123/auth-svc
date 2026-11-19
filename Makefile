@@ -34,7 +34,7 @@ FETCH_NEXT_TAG = $(shell \
 	fi)
 
 # Only query Docker Hub if a docker-related target is invoked and TAG was not specified
-ifeq ($(filter docker-% build-docker push-docker next-tag current-tag,$(MAKECMDGOALS)),)
+ifeq ($(filter docker-% build push build-docker push-docker next-tag current-tag,$(MAKECMDGOALS)),)
   TAG ?= $(INITIAL_VERSION)
 else
   TAG ?= $(FETCH_NEXT_TAG)

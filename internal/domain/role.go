@@ -15,7 +15,6 @@ type Role struct {
 	ResourceActions []ResourceAction  `json:"resource_actions,omitempty"`
 	Description     string            `json:"description,omitempty"`
 	Scope           map[string]string `json:"scope,omitempty"`
-	Permissions     []*Permission     `json:"permissions,omitempty"`
 }
 
 // ListRoleInput defines filter criteria for querying roles.

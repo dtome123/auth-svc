@@ -12,11 +12,11 @@ type AuthorizationRepository interface {
 	UpdateRole(ctx context.Context, role *domain.Role) error
 	GetRole(ctx context.Context, id string) (*domain.Role, error)
 	GetRoleByCode(ctx context.Context, code string, scope map[string][]string) (*domain.Role, error)
-	ListRoles(ctx context.Context, input domain.ListRoleInput) ([]*domain.Role, error)
+	ListRoles(ctx context.Context, input domain.RoleCriteria) ([]*domain.Role, error)
 	ListRolesByIDs(ctx context.Context, ids []string) ([]*domain.Role, error)
 
 	// Permission management
-	ListPermissions(ctx context.Context, input domain.ListPermissionsInput) ([]*domain.Permission, error)
+	ListPermissions(ctx context.Context, input domain.PermissionsCriteria) ([]*domain.Permission, error)
 	GetPermissionsByIDs(ctx context.Context, ids []string) ([]*domain.Permission, error)
 	GetPermissionsByUserID(ctx context.Context, userID string) ([]domain.ResourceAction, error)
 	BatchUpsertPermissions(ctx context.Context, permissions []*domain.Permission) error

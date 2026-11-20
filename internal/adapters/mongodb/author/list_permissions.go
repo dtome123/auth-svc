@@ -9,9 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-
 // ListPermissions retrieves permissions with optional domain filter and pagination.
-func (r *impl) ListPermissions(ctx context.Context, input domain.ListPermissionsInput) ([]*domain.Permission, error) {
+func (r *impl) ListPermissions(ctx context.Context, input domain.PermissionsCriteria) ([]*domain.Permission, error) {
 	skip, limit := utils.PaginationToSkipLimit(input.PageNumber, input.PageLimit)
 
 	findOpts := options.Find()

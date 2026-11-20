@@ -17,8 +17,8 @@ type Role struct {
 	Scope           map[string]string `json:"scope,omitempty"`
 }
 
-// ListRoleInput defines filter criteria for querying roles.
-type ListRoleInput struct {
+// RoleCriteria defines filter criteria for querying roles.
+type RoleCriteria struct {
 	Keyword    string
 	Scope      map[string][]string
 	PageNumber int64

@@ -11,7 +11,7 @@ type Permission struct {
 	Description string   `bson:"description,omitempty" json:"description,omitempty"`
 	Resource    string   `bson:"resource" json:"resource"`
 	Actions     []string `bson:"actions" json:"actions"`
-	Scopes      []string `bson:"scopes,omitempty" json:"scopes,omitempty"`
+	Scopes      map[string][]string `bson:"scopes,omitempty" json:"scopes,omitempty"`
 }
 
 func (Permission) CollectionName() string {

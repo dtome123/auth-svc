@@ -16,12 +16,12 @@ func (svc *AuthorizationService) LoadAllPolicies(ctx context.Context) error {
 		return nil
 	}
 
-	roles, err := svc.authorizationRepo.ListRoles(ctx, domain.ListRoleInput{})
+	roles, err := svc.authorizationRepo.ListRoles(ctx, domain.RoleCriteria{})
 	if err != nil {
 		return fmt.Errorf("failed to list roles: %w", err)
 	}
 
-	permissions, err := svc.authorizationRepo.ListPermissions(ctx, domain.ListPermissionsInput{})
+	permissions, err := svc.authorizationRepo.ListPermissions(ctx, domain.PermissionsCriteria{})
 	if err != nil {
 		return fmt.Errorf("failed to list permissions: %w", err)
 	}
@@ -230,4 +230,3 @@ func formatUserScopes(resourceActions []domain.ResourceAction) ([]string, map[st
 
 	return scopeList, bestScope
 }
-

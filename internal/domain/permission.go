@@ -8,11 +8,11 @@ type Permission struct {
 	Description string   `json:"description,omitempty"`
 	Resource    string   `json:"resource"`
 	Actions     []string `json:"actions"`
-	Scopes      []string `json:"scopes,omitempty"`
+	Scopes      map[string][]string `json:"scopes,omitempty"`
 }
 
-// ListPermissionsInput defines filter criteria for querying permissions.
-type ListPermissionsInput struct {
+// PermissionsCriteria defines filter criteria for querying permissions.
+type PermissionsCriteria struct {
 	Keyword    string
 	Domains    []string
 	PageNumber int64

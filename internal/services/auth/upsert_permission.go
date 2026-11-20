@@ -24,7 +24,7 @@ func (svc *AuthorizationService) MigratePermission(ctx context.Context, req Migr
 			if role == nil {
 				continue
 			}
-			existing, err := svc.authorizationRepo.ListRoles(ctx, domain.ListRoleInput{Keyword: role.Name})
+			existing, err := svc.authorizationRepo.ListRoles(ctx, domain.RoleCriteria{Keyword: role.Name})
 			var found *domain.Role
 			if err == nil {
 				for _, r := range existing {

@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type ListPermissionsInput = domain.ListPermissionsInput
+type ListPermissionsInput = domain.PermissionsCriteria
 
 func (s *AuthorizationService) ListPermissions(ctx context.Context, input ListPermissionsInput) ([]*domain.Permission, error) {
 

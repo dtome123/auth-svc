@@ -25,8 +25,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f h1:lO4WD4F/rVNCu3HqELle0jiPLLBs70cWOduZpkS1E78=
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f/go.mod h1:cuUVRXasLTGF7a8hSLbxyZXjz+1KgoB3wDUb6vlszIc=
-github.com/dtome123/auth-sdk v0.1.2-0.20261119180030-ac1521321b40 h1:GTuq+An5U8USKRI4HhLTnBozyjrBHjPst7tW48XRM/s=
-github.com/dtome123/auth-sdk v0.1.2-0.20261119180030-ac1521321b40/go.mod h1:C6ifd38NRbPpuSe9aiW+yefp43alVwxGNOVf7+zUJ5M=
+github.com/dtome123/auth-sdk v0.1.2-0.20261120132234-d5f4386108f0 h1:kqgyyiHS0B2eOyIMAZ6E3IaAPZCExSuI0CHv1CV/wJY=
+github.com/dtome123/auth-sdk v0.1.2-0.20261120132234-d5f4386108f0/go.mod h1:C6ifd38NRbPpuSe9aiW+yefp43alVwxGNOVf7+zUJ5M=
 github.com/dtome123/go-mongo-generic v0.0.0-20250805072324-aecc90b51c5b h1:d3CSWDnKeO2WBgeitQ21zWApIb4WE0puI+jnAcCyQyY=
 github.com/dtome123/go-mongo-generic v0.0.0-20250805072324-aecc90b51c5b/go.mod h1:9naP1NRrFeYb97QQYxQ3yKb3leSH1hv5pyi/n5wl32g=
 github.com/envoyproxy/go-control-plane/envoy v1.32.4 h1:jb83lalDRZSpPWW2Z7Mck/8kXZ5CQAFYVjQcdVIr83A=

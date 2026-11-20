@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type ListRoleInput = domain.ListRoleInput
+type ListRoleInput = domain.RoleCriteria
 
 func (s *AuthorizationService) ListRole(ctx context.Context, input ListRoleInput) ([]*domain.Role, error) {
 	roles, err := s.authorizationRepo.ListRoles(ctx, input)

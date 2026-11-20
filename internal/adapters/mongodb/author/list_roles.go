@@ -10,7 +10,7 @@ import (
 )
 
 // ListRoles retrieves roles from the database with pagination support by page number and page limit.
-func (repo *impl) ListRoles(ctx context.Context, input domain.ListRoleInput) ([]*domain.Role, error) {
+func (repo *impl) ListRoles(ctx context.Context, input domain.RoleCriteria) ([]*domain.Role, error) {
 	skip, limit := utils.PaginationToSkipLimit(input.PageNumber, input.PageLimit)
 
 	findOpts := options.Find()

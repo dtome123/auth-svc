@@ -29,7 +29,7 @@ func ToPermissionsProto(in []*domain.Permission) []*authPb.Permission {
 			Domain:   p.Domain,
 			Resource: p.Resource,
 			Actions:  p.Actions,
-			Scopes:   p.Scopes,
+			Scopes:   toProtoScopes(p.Scopes),
 		})
 	}
 
@@ -39,10 +39,16 @@ func ToPermissionsProto(in []*domain.Permission) []*authPb.Permission {
 func ToResourceActionsPermissionsProto(in []domain.ResourceAction) []*authPb.Permission {
 	var permissions []*authPb.Permission
 	for _, ra := range in {
+		var scopes map[string]*authPb.StringList
+		if len(ra.Scopes) > 0 {
+			scopes = map[string]*authPb.StringList{
+				"scopes": {Values: ra.Scopes},
+			}
+		}
 		permissions = append(permissions, &authPb.Permission{
 			Id:      ra.PermissionID,
 			Actions: ra.Actions,
-			Scopes:  ra.Scopes,
+			Scopes:  scopes,
 		})
 	}
 	return permissions
@@ -92,7 +98,7 @@ func FromPermissionProto(in *authPb.Permission) *domain.Permission {
 		Domain:   in.Domain,
 		Resource: in.Resource,
 		Actions:  in.Actions,
-		Scopes:   in.Scopes,
+		Scopes:   fromProtoScopes(in.Scopes),
 	}
 }
 
@@ -128,4 +134,28 @@ func FromListResourceActionsProto(in []*authPb.ResourceAction) []domain.Resource
 		})
 	}
 	return actions
+}
+
+func toProtoScopes(in map[string][]string) map[string]*authPb.StringList {
+	if in == nil {
+		return nil
+	}
+	res := make(map[string]*authPb.StringList, len(in))
+	for k, v := range in {
+		res[k] = &authPb.StringList{Values: v}
+	}
+	return res
+}
+
+func fromProtoScopes(in map[string]*authPb.StringList) map[string][]string {
+	if in == nil {
+		return nil
+	}
+	res := make(map[string][]string, len(in))
+	for k, v := range in {
+		if v != nil {
+			res[k] = v.Values
+		}
+	}
+	return res
 }

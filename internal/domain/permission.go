@@ -15,6 +15,7 @@ type Permission struct {
 type PermissionsCriteria struct {
 	Keyword    string
 	Domains    []string
+	Scope      map[string][]string
 	PageNumber int64
 	PageLimit  int64
 }

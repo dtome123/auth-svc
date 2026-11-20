@@ -36,6 +36,15 @@ func (r *impl) ListPermissions(ctx context.Context, input domain.PermissionsCrit
 		}
 	}
 
+	if input.Scope != nil {
+		for k, v := range input.Scope {
+			if len(v) == 0 {
+				continue
+			}
+			filter["scopes."+k] = bson.M{"$in": v}
+		}
+	}
+
 	permDocs, err := r.permissionCol.Find(ctx, filter, findOpts, nil)
 	if err != nil {
 		return nil, err
